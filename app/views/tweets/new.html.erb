@@ -1,0 +1,15 @@
+<div class="contents row">
+  <div class ="container">
+  <h3>投稿する</h3>
+    <%= form_with(model: @tweet, local: true) do |f| %>
+      <%= f.text_field :name, placeholder: "ニックネーム" %>
+      <%= f.text_field :image, placeholder: "イメージURL" %>
+      <%= f.text_area :text, placeholder: "テキストを入力", rows: "10" %>
+      <%= f.submit "送信する" %>
+    <% end %>
+  </div>
+</div>
+
+
+<%# 4行目で指定しているインスタンス変数は、コントローラーで定義した@tweet = Tweet.new %>
+<%# form_withを用いることで、投稿先のパスやHTTPメソッドを指定する必要がなくなる %>
