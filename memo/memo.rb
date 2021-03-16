@@ -150,3 +150,15 @@ Gemをインストールした後はrails sをcontrol + Cで一度停止し、
 % rails s
 
 
+deviseの設定ファイルを作成
+deviseを使用するためには、Gemのインストールに加え、
+devise専用のコマンドで設定ファイルを作成する必要がある。
+
+rails g devise:installコマンド
+このコマンドは、
+追加したdeviseというGemの「設定関連に使用するファイル」を自動で生成するコマンド。
+
+コマンドを実行して設定ファイルを作成
+ターミナル
+# deviseの設定ファイルを作成
+% rails g devise:install
