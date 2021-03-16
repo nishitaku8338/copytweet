@@ -1,7 +1,7 @@
 class TweetsController < ApplicationController
   
   def index
-    @tweets = Tweet.all
+    @tweets = Tweet.all  # データベースに保存されているすべてのデータを取得
   end
 
   def new
@@ -26,6 +26,10 @@ class TweetsController < ApplicationController
     # ビューファイルにインスタンス変数を使用しないので「@」を使わない
     tweet = Tweet.find(params[:id])  # 編集したいツイートをfindメソッドを用いて取得
     tweet.update(tweet_params)       # tweet_paramsというストロングパラメーターを定義
+  end
+
+  def show
+    @tweet = Tweet.find(params[:id])  # ツイート詳細画面に必要な情報を、findメソッドを用いてデータベースから取得
   end
 
   private
