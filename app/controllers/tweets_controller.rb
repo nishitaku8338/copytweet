@@ -17,6 +17,10 @@ class TweetsController < ApplicationController
     tweet.destroy                    # ツイートをdestroyメソッドで削除
   end
 
+  def edit
+    @tweet = Tweet.find(params[:id])  # 編集したいツイートをfindメソッドを用いて取得、form_withのmodelオプション(引数)に使う
+  end
+
   private
   # tweet_paramsというストロングパラメーターを定義し、createメソッドの引数に使用して、tweetsテーブルへ保存
   def tweet_params
