@@ -1,0 +1,11 @@
+<div class="contents row">
+  <div class="container">
+    <h3>編集する</h3>
+    <%= form_with(model: @tweet, local: true) do |f| %>
+      <%= f.text_field :name, placeholder: "ニックネーム" %>
+      <%= f.text_field :image, placeholder: "イメージ URL" %>
+      <%= f.text_area :text, placeholder: "テキストを入力", rows: "10" %>
+      <%= f.submit "送信する" %>
+    <% end %>
+  </div>
+</div>
