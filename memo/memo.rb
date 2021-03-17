@@ -217,3 +217,8 @@ HTMLを修正できるため、カスタマイズ可能になる。
 
 
 
+ログイン・サインアップ画面のビューを編集
+・サインアップ画面のビュー
+app/views/devise/registrations/new.html.erb
+・ログイン画面のビュー
+app/views/devise/sessions/new.html.erb
