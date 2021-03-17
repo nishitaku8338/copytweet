@@ -1,5 +1,10 @@
 class TweetsController < ApplicationController
-  before_action :set_tweet, only: [:edit, :show]  # set_tweetというメソッドを定義して、同じコードをメソッドにまとめる
+  # set_tweetというメソッドを定義して、同じコードをメソッドにまとめる
+  before_action :set_tweet, only: [:edit, :show]
+
+  # ログイン状態によって、遷移できるページを制限する
+  # indexアクション・showアクションは適用されない
+  before_action :move_to_index, except: [:index, :show]
 
   def index
     @tweets = Tweet.all  # データベースに保存されているすべてのデータを取得
@@ -42,5 +47,12 @@ class TweetsController < ApplicationController
   # set_tweetというメソッドを定義して、editアクション・showアクションの同じコードをまとめる
   def set_tweet
     @tweet = Tweet.find(params[:id])  # 単一レコードを取得
+  end
+
+  # ログインしていない状態で新規投稿画面へ直接アクセスした場合、indexアクションのindex.html.erbページにリダイレクトする。
+  def move_to_index
+    unless user_signed_in?  # unlessでuser_signed_in?を判定(userがログインしているか)
+      redirect_to action: :index  # その返り値がfalseだった場合にredirect_toが実行される。
+    end
   end
 end

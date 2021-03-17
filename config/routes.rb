@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users
   root to: 'tweets#index'                  # http://localhost:3000/
   # resources :tweets, only: [:index, :new, :create, :destroy, :edit, :update, :show]  # http://localhost:3000/tweets/new tweetsコントローラーのnewアクションが実行される設定
   resources :tweets  # resourcesは、7つのアクションをまとめてルーティングの設定ができる
