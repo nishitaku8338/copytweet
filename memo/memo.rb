@@ -162,3 +162,39 @@ rails g devise:installコマンド
 ターミナル
 # deviseの設定ファイルを作成
 % rails g devise:install
+
+
+
+deviseのUserモデルを作成
+deviseを利用する際には、
+アカウントを作成するためのUserモデルを新しく作成する必要がある。
+作成には通常のモデルの作成方法ではなく、
+deviseのモデル作成用コマンドでUserモデルを作成する。
+
+rails g deviseコマンド
+rails g deviseコマンドは、
+deviseによるユーザー機能の対象を指定することで、
+モデルとマイグレーションの生成やルーティングの設定などをまとめて処理できる。
+実行すると、モデルが生成され、routes.rbにはdeviseに関連するパスが追加される。
+
+コマンドを実行してUserモデルを作成
+rails g deviseコマンドでuserを指定
+ターミナル
+# deviseコマンドでUserモデルを作成
+% rails g devise user
+
+ユーザーに関する、モデルやマイグレーションも自動生成される。
+また、routes.rbに以下のルーティングが自動的に追記される。
+【例】config/routes.rb
+Rails.application.routes.draw do
+  devise_for :users
+end
+
+devise_forは、
+ユーザー機能に必要な複数のルーティングを一度に生成してくれるdeviseのメソッド。
+※モデルとマイグレーションは作成されるが、usersテーブルは作成されていない。
+そのため、このコマンドを実行した後にhttp://localhost:3000へアクセスするとエラーが生じる。
+rails db:migrateを実行する必要があるが、
+カラムのなど追加する必要がある場合、編集してからマイグレートを実行する。
+
+
