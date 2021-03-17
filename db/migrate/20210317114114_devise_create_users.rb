@@ -4,6 +4,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :users do |t|
       ## Database authenticatable
+
+      # deviseのuserモデルを作成すると、メールアドレス・パスワードのカラムがデフォルトで記述される。
       t.string :email,              null: false, default: ""
       t.string :encrypted_password, null: false, default: ""
 
@@ -32,8 +34,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[6.0]
       # t.string   :unlock_token # Only if unlock strategy is :email or :both
       # t.datetime :locked_at
 
-
-      t.timestamps null: false
+      # レコードの作成日時と更新日時を管理するためのカラム
+      t.timestamps null: false  # deviseに関係なく、マイグレーションファイルが生成された際に、初期状態で記述してある。
     end
 
     add_index :users, :email,                unique: true
