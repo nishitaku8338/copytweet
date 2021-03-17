@@ -289,3 +289,84 @@ text_fieldにつけることができるオプションである。
 
 上記の場合、生成されたフォームに7文字以上入力すると、
 エンターキーを押した瞬間に6文字になるまでカットされる。
+
+
+
+ストロングパラメーターを使えるように
+deviseに関しても、同様にストロングパラメーターをコントローラーに記述する。
+しかし、deviseの処理を行うコントローラーはGem内に記述されているため、編集することができない。
+また、deviseでログイン機能を実装した場合は、
+paramsの他に、paramsとは異なる形のパラメーターも受け取っている。
+以上から、deviseのコントローラーにストロングパラメーターを反映する方法と、
+devise特有のパラメーターを取得する方法が、必要になる。
+まずはdevise特有のパラメーターを取得するために、
+deviseが提供しているdevise_parameter_sanitizerというメソッドを使う。
+
+devise_parameter_sanitizerメソッド
+deviseにおけるparamsのようなメソッド。
+deviseのUserモデルに関わる「ログイン」「新規登録」などのリクエストからパラメーターを取得できる。
+このメソッドとpermitメソッドを組み合わせることにより、
+deviseに定義されているストロングパラメーターに対し、
+自分で新しく追加したカラムも指定して含めることができる。
+
+devise_parameter_sanitizerメソッドは、
+これまでのストロングパラメーターと同じく、
+新たに定義するプライベートメソッドの中で使用する。
+deviseの提供元では、新たに定義するメソッド名を
+configure_permitted_parameters
+と紹介していることから、慣習的にこのメソッド名で定義することが多い。
+【例】devise_parameter_sanitizerメソッド
+private
+def configure_permitted_parameters  # メソッド名は慣習
+  # deviseのUserモデルにパラメーターを許可
+  devise_parameter_sanitizer.permit(:deviseの処理名, keys: [:許可するキー])
+end
+
+ただし、あくまで慣習なので定義するメソッド名は自由につけても構話ない。
+
+また、devise_parameter_sanitizerに使用するpermitメソッドの引数が、
+これまでと異なる点に注目。
+これは、deviseに定義されているpermitメソッドであり、
+Railsではじめから使用できたpermitメソッドとは異なるものであるため。
+【例】名前は同じでも、中身は異なるpermit
+# paramsのpermitメソッド
+params.require(:モデル名).permit(:許可するキー)
+
+# devise_parameter_sanitizerのpermitメソッド
+devise_parameter_sanitizer.permit(:deviseの処理名, keys: [:許可するキー])
+
+
+deviseのpermitは、
+第一引数にdeviseの処理名、
+第二引数にkeysというキーに対し、
+配列でキーを指定することで、許可するパラメーターを追加します。
+
+第一引数の処理名には、deviseですでに設定されているsign_in,
+sign_up, account_updateが使用でき、
+それぞれサインイン時やサインアップ時、アカウント情報更新時の処理に対応する。
+
+処理名            役割
+:sign_in         サインイン（ログイン）の処理を行うとき
+:sign_up         サインアップ（新規登録）の処理を行うとき
+:account_update  アカウント情報更新の処理を行うとき
+
+第一引数で指定した処理に対して、
+第二引数のkeysで指定された名前と同じキーを持つパラメーターの取得を許可する。
+ビューに記述した各フォーム部品のname属性値が、フォームから送信されるパラメーターのキーとなる。
+
+deviseにストロングパラメーターを追加するコードは、
+deviseのコントローラーが編集できないため、application_controller.rbに記述する。
+
+
+application_controller.rbファイル
+すべてのコントローラーが継承しているファイル。
+すなわち、ここに処理を記述しておくことで、すべてのコントローラーで共通となる処理を作ることができる。
+これまで作成したtweets_controller.rbやdeviseのコントローラーも、
+application_controller.rbの処理が読み込まれた上で作られる仕組みになっている。
+
+※deviseの処理に関わるコントローラーはGemに記述されており、編集ができない。
+そのため、編集ができるapplication_controller.rbにストロングパラメーターを定義しておき、その処理を読み込ませる。
+
+
+ブラウザで登録画面を確認
+http://localhost:3000/users/sign_up
