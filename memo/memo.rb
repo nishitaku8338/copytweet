@@ -370,3 +370,34 @@ application_controller.rbの処理が読み込まれた上で作られる仕組�
 
 ブラウザで登録画面を確認
 http://localhost:3000/users/sign_up
+
+
+
+UI/UXを整える
+ログインの有無で表示を変える
+ヘッダー部分のHTMLは、すべてのビューで共通のテンプレートである
+application.html.erbで編集できる。
+application.html.erbを編集して、
+未ログイン時とログイン時でボタンの表示を変える実装をする。
+ログイン状態の確認には、user_signed_in?メソッドを使用する。
+
+user_signed_in?メソッド
+Gemのdeviseを導入しているため、使用できるメソッド。
+ログインしているかどうかの判定を行う。
+user_signed_in?メソッドは、
+ユーザーがログインしていればtrueを、
+ログアウト状態であればfalseを返す。
+【例】user_signed_in?
+# ログインしているユーザーのとき
+user_signed_in?
+#=> true
+
+# ログインしていないユーザーのとき
+user_signed_in?
+#=> false
+
+
+link_toで作成したリンクは、デフォルトでGETメソッドを使用している。
+そのため、DELETEメソッドを使用する際はmethodオプションに:deleteの指定が必要。
+GETメソッドを使用する場合は、methodオプションを省略できる。
+また、ログアウト以外にはclassオプションを使い、class属性をつけることで、CSSが適用されるようにする。
