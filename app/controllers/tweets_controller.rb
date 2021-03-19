@@ -40,8 +40,11 @@ class TweetsController < ApplicationController
 
   private
   # tweet_paramsというストロングパラメーターを定義し、createメソッド・updateメソッドの引数に使用して、tweetsテーブルへ保存
+  # require(モデル名)、permit(カラム名)。カラム名はマイグレーションファイルを参照する
+  # current_userメソッドはdeviseのメソッド。現在ログインしているユーザーの情報を取得できる
+  # mergeメソッドでtweetの情報を持つハッシュと、user_idを持つハッシュを結合させる
   def tweet_params
-    params.require(:tweet).permit(:name, :image, :text)  # require(モデル名)、permit(カラム名)。カラム名はマイグレーションファイルを参照する
+    params.require(:tweet).permit(:name, :image, :text).merge(user_id: current_user.id)
   end
 
   # set_tweetというメソッドを定義して、editアクション・showアクションの同じコードをまとめる

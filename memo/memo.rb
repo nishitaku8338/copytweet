@@ -463,3 +463,37 @@ rails g migrationコマンドとは、マイグレーションファイルを生
 スネークケースとキャメルケースとは、複数の単語が連立する場合に使用する命名パターンのこと
 devise_parameter_sanitizerメソッドとは、deviseでユーザー登録する場合に使用できる、「特定のカラムを許容する」メソッドのこと
 application_controller.rbファイルとは、rails g controllerが生成するコントローラーが予め継承しているコントローラーのこと
+
+
+
+ツイート保存時にユーザー情報も追加
+tweetsテーブルにuser_idカラムが追加され、
+このuser_idカラムに、ツイートを投稿したユーザーのidを保存する処理を記述する。
+ツイートを投稿したユーザーとはつまり、現在ログインしているユーザーのこと、
+そのため、tweetsテーブルのuser_idカラムに保存すべき値は、current_userのid
+
+ツイートを保存する際、name、image、textというビューから送られてくる情報に加えて、
+user_idカラムにログイン中のユーザーのidを保存しなければいけない。
+ログイン中のユーザーが持つidを取得するには、current_userメソッドを使用する。
+
+
+current_userメソッド
+Gemのdeviseを導入しているため、使用できるメソッド。
+current_userは、現在ログインしているユーザーの情報を取得できる。
+現在、ビューから送られてくる情報が入ったparamsと、
+current_userメソッドで取得したログイン中ユーザーのidを統合した上で、
+ツイートを保存させたいところ。
+そこで、2つのハッシュを統合するときに使うmergeメソッドを利用して、
+paramsとuser_idの情報を統合できる。
+
+mergeメソッド
+ハッシュを結合させるときに使用するRubyのメソッド。
+今回は、tweetの情報を持つハッシュと、user_idを持つハッシュを結合さる。
+以下の例のように、2つのハッシュを1つにまとめることができる。
+【例】
+tweet = { name: "たなか", text: "test", image: "test.jpeg" }
+uid = { user_id: "1" }
+tweet.merge(uid)
+=> {:name=>"たなか", :text=>"test", :image=>"test.jpeg", :user_id=>"1"}
+
+
