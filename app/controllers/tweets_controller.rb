@@ -7,7 +7,9 @@ class TweetsController < ApplicationController
   before_action :move_to_index, except: [:index, :show]
 
   def index
-    @tweets = Tweet.all  # データベースに保存されているすべてのデータを取得
+    # @tweets = Tweet.all  # データベースに保存されているすべてのデータを取得
+    # includesメソッドを使用してN+1問題を解消
+    @tweets = Tweet.includes(:user)  # includesメソッドを使用するとすべてのレコードを取得
   end
 
   def new
