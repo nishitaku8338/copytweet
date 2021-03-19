@@ -9,7 +9,8 @@ class TweetsController < ApplicationController
   def index
     # @tweets = Tweet.all  # データベースに保存されているすべてのデータを取得
     # includesメソッドを使用してN+1問題を解消
-    @tweets = Tweet.includes(:user)  # includesメソッドを使用するとすべてのレコードを取得
+    # @tweets = Tweet.includes(:user)  # includesメソッドを使用するとすべてのレコードを取得
+    @tweets = Tweet.includes(:user).order("created_at DESC")  # レコードは降順に並び替え(新しいツイートが上に表示される)
   end
 
   def new
