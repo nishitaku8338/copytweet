@@ -1,7 +1,10 @@
 <div class="contents row">
   <div class="content_post" style="background-image: url(<%= @tweet.image %>);">
+    
+    <%# プルダウン機能 %>
     <div class="more">
-      <span><%= image_tag 'arrow_top.png' %></span>
+      <span><%= image_tag 'arrow_top.png' %></span>  <%# プルダウンのアイコン画像を表示 %>
+      <%# プルダウンの中身 %>
       <ul class="more_list">
         <li>
           <%= link_to '編集', edit_tweet_path(@tweet.id), method: :get %>
@@ -11,8 +14,19 @@
         </li>
       </ul>
     </div>
+
     <p><%= @tweet.text %></p>
-    <span class="name"><%= @tweet.name %>
+    
+    <%# <span class="name"><%= @tweet.name %>  <%# ⇐下記に変更 %>
+    <%# 投稿者のリンクをクリックすると、投稿者が投稿したツイートの一覧が表示されるページにアクセスする %>
+    <span class="name">
+      <%= link_to user_path(@tweet.user.id) do %>
+        <span>投稿者</span><%= @tweet.user.nickname %>
+      <% end %>
+      
+      <%# <a href="/users/<%= @tweet.user.id %>
+        <%# <span>投稿者</span><%= @tweet.user.nickname %>
+      <%# </a> %>
     </span>
   </div>
 </div>

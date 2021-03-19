@@ -8,7 +8,8 @@
       
       <%# プルダウンを表示する、編集と削除ボタンがある %>
       <div class="more">
-        <span><%= image_tag 'arrow_top.png' %></span>
+        <span><%= image_tag 'arrow_top.png' %></span>  <%# プルダウンのアイコン画像を表示 %>
+        <%# プルダウンの中身 %>
         <ul class="more_list">
           <li>
             <%= link_to '編集', edit_tweet_path(tweet.id), method: :get %>
