@@ -519,3 +519,27 @@ Userモデルの視点で考えると、あるユーザーの作成した投稿�
 この関連付けをするため、
 userと他のモデルとの間に「1対多」のつながりがあることを示すのがhas_manyメソッド。
 
+belongs_toメソッド
+1つの投稿は、1人のユーザーが投稿したもの。
+つまり1つの投稿を複数人が投稿できないため、投稿は必ず1人のユーザーに所属する。
+この状態のことをbelongs toの関係といい、今回の場合は「Tweet belongs to User」の状態である。
+Tweetモデルと他のモデル（User）との間に「1対1」のつながりがあることを示すのがbelongs_toメソッド。
+
+
+※アソシエーションでbelongs_toを指定した場合は、
+相手のモデルのid（今回はuser_id）が存在するというバリデーションは不要である。
+
+user_idカラムに対して「空ではないか」というpresence: trueのバリデーションを設ける必要はない。
+なぜならアソシエーションでbelongs_toを指定した場合、
+相手のモデルのid（今回はuser_id）が「空ではないか」というバリデーションが、
+デフォルトでかかるようになっているから。
+【例】app/models/tweet.rb
+class Tweet < ApplicationRecord
+  belongs_to :user
+  validates :user_id presence: true ←不要
+end
+
+これで、TweetモデルとUserモデル間のアソシエーションが実装できた。
+
+
+
