@@ -12,7 +12,7 @@
           </li>
 
           <%# 投稿者本人か確認して表示を変える %>
-          <%= if user_signed_in? && current_user.id == tweet.user_id %>  <%# ユーザーがログインしている 且つ 投稿したユーザーである投稿だけに許可 %>
+          <% if user_signed_in? && current_user.id == tweet.user_id %>  <%# ユーザーがログインしている 且つ 投稿したユーザーである投稿だけに許可 %>
             <li>
               <%= link_to '編集', edit_tweet_path(tweet.id), method: :get %>
             </li>
