@@ -46,7 +46,8 @@ class TweetsController < ApplicationController
   # current_userメソッドはdeviseのメソッド。現在ログインしているユーザーの情報を取得できる
   # mergeメソッドでtweetの情報を持つハッシュと、user_idを持つハッシュを結合させる
   def tweet_params
-    params.require(:tweet).permit(:name, :image, :text).merge(user_id: current_user.id)
+    # params.require(:tweet).permit(:name, :image, :text).merge(user_id: current_user.id)  # ※1
+    params.require(:tweet).permit(:image, :text).merge(user_id: current_user.id)
   end
 
   # set_tweetというメソッドを定義して、editアクション・showアクションの同じコードをまとめる
@@ -61,3 +62,8 @@ class TweetsController < ApplicationController
     end
   end
 end
+
+# ※1
+# 投稿時に「name」を入力する必要がなくなったので、それに合わせてtweetsコントローラーの処理も変更
+# nameカラムはもう使用しないので、ツイートの保存時にnameカラムへ情報を保存しないよう変更
+# permit(:name, :image, :text)から:nameを削除
