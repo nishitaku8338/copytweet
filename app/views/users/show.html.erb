@@ -1,0 +1,26 @@
+<div class="contents row">
+  <%# ログインしているユーザー名を表示する %>
+  <p><%= @nickname %>さんの投稿一覧</p>
+
+  <%# ユーザーが投稿したツイートを全部表示させる %>
+  <% @tweets.each do |tweet| %>
+    <div class="content_post" style="background-image: url(<%= tweet.image %>);">
+      
+      <%# プルダウンを表示する、編集と削除ボタンがある %>
+      <div class="more">
+        <span><%= image_tag 'arrow_top.png' %></span>
+        <ul class="more_list">
+          <li>
+            <%= link_to '編集', edit_tweet_path(tweet.id), method: :get %>
+          </li>
+          <li>
+            <%= link_to '削除', tweet_path(tweet.id), method: :delete %>
+          </li>
+        </ul>
+      </div>
+      
+      <p><%= tweet.text %></p>
+      <span class="name"><%= tweet.name %></span>
+    </div>
+  <% end %>
+</div>
