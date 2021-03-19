@@ -10,12 +10,16 @@
           <li>
             <%= link_to '詳細', tweet_path(tweet.id), method: :get %>
           </li>
-          <li>
-            <%= link_to '編集', edit_tweet_path(tweet.id), method: :get %>
-          </li>
-          <li>
-            <%= link_to '削除', tweet_path(tweet.id), method: :delete %>
-          </li>
+
+          <%# 投稿者本人か確認して表示を変える %>
+          <%= if user_signed_in? && current_user.id == tweet.user_id %>  <%# ユーザーがログインしている 且つ 投稿したユーザーである投稿だけに許可 %>
+            <li>
+              <%= link_to '編集', edit_tweet_path(tweet.id), method: :get %>
+            </li>
+            <li>
+              <%= link_to '削除', tweet_path(tweet.id), method: :delete %>
+            </li>
+          <% end %>
         </ul>
       </div>
       
@@ -35,3 +39,13 @@
     </div>
   <% end %>
 </div>
+
+
+<%# 投稿者本人か確認して表示を変える %>
+<%# current_user.id == tweet.user_idと記述することで、
+「現在ログインしているユーザー」と「ツイートを投稿したユーザー」が同じか否かを判定することができる。
+tweet.user_idという記述は、tweetとuserのアソシエーションによって成立している。
+if文中に複数の条件を定義する際に、論理演算子&&を用いていることも確認する。
+&&は論理演算子の1つ。
+条件A && 条件Bとなっていた場合、条件Aと条件Bが共に真の場合のみtrueが返され、その後の処理が実行される。
+反対に、条件Aと条件Bのどちらか、または双方が偽であった場合はfalseが返される。 %>

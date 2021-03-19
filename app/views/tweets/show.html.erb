@@ -1,19 +1,22 @@
 <div class="contents row">
   <div class="content_post" style="background-image: url(<%= @tweet.image %>);">
     
-    <%# プルダウン機能 %>
-    <div class="more">
-      <span><%= image_tag 'arrow_top.png' %></span>  <%# プルダウンのアイコン画像を表示 %>
-      <%# プルダウンの中身 %>
-      <ul class="more_list">
-        <li>
-          <%= link_to '編集', edit_tweet_path(@tweet.id), method: :get %>
-        </li>
-        <li>
-          <%= link_to '削除', tweet_path(@tweet.id), method: :delete %>
-        </li>
-      </ul>
-    </div>
+    <%# 投稿者本人か確認して表示を変える %>
+    <%= if user_signed_in? && current_user.id == @tweet.user_id %>  <%# ユーザーがログインしている 且つ 投稿したユーザーである投稿だけに許可 %>
+      <%# プルダウン機能 %>
+      <div class="more">
+        <span><%= image_tag 'arrow_top.png' %></span>  <%# プルダウンのアイコン画像を表示 %>
+        <%# プルダウンの中身 %>
+        <ul class="more_list">
+          <li>
+            <%= link_to '編集', edit_tweet_path(@tweet.id), method: :get %>
+          </li>
+          <li>
+            <%= link_to '削除', tweet_path(@tweet.id), method: :delete %>
+          </li>
+        </ul>
+      </div>
+    <% end %>
 
     <p><%= @tweet.text %></p>
     
@@ -33,3 +36,9 @@
 
 <%# 基本的にはtweets/index.html.erbと同じ構造をしている。%>
 <%# 違いは、表示する投稿数が1つなので、each文などを使用していないこと。%>
+
+<%# 投稿者本人か確認して表示を変える %>
+<%# current_user.id == @tweet.user_idという条件を含むif文で、
+プルダウンメニューごと囲むことによって、
+「未ログイン時や自分の投稿ではないときは非表示」となるように書き換える。
+ログイン中ユーザーが投稿したツイートには、詳細ボタンに加えて「編集・削除ボタン」が表示される。 %>
