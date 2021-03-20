@@ -1,14 +1,12 @@
 <div class="contents row">
   <div class="container">
     <h3>編集する</h3>
-    <%= form_with(model: @tweet, local: true) do |f| %>
-      <%# <%= f.text_field :name, placeholder: "ニックネーム" %>  <%# ※1 %>
-      <%= f.text_field :image, placeholder: "イメージ URL" %>
-      <%= f.text_area :text, placeholder: "テキストを入力", rows: "10" %>
-      <%= f.submit "送信する" %>
-    <% end %>
+
+    <%# 部分テンプレート _form.html.erbファイルを呼び出す %>
+    <%= render partial: "form", locals: { tweet: @tweet } %>
+
   </div>
 </div>
 
-<%# ※1 ツイートを表示する際にアソシエーションを利用して投稿者のニックネームが表示されるようになったので、nameカラムは必要ない。 %>
-<%# したがって、編集時に「Nickname」の値を入力する必要もない。 %>
+<%# 切り出したフォームの部分テンプレートにおいては、model: tweetとなっている。_form.html.erbを確認する。
+したがって、locals: { tweet: @tweet }と記述して、@tweet → tweetと読み替える記述をする。 %>
