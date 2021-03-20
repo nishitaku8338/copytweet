@@ -1,0 +1,22 @@
+<%# tweetsのnew.html.erb 部分テンプレート中身 %>
+<%# tweetsのedit.html.erb 部分テンプレート中身 %>
+
+
+<%#= form_with(model: @tweet, local: true) do |f| %>
+<%# renderのlocalsオプションで、@tweetをtweetに統一するため、form_withのmodelの引数をtweetに変更 %>
+
+<%= form_with(model: tweet, local: true) do |f| %>
+  <%# <%= f.text_field :name, placeholder: "ニックネーム" %>  <%# ※1 %>
+  <%= f.text_field :image, placeholder: "イメージURL" %>
+  <%= f.text_area :text, placeholder: "テキストを入力", rows: "10" %>
+  <%= f.submit "送信する" %>
+<% end %>
+
+
+<%# 8行目で指定しているインスタンス変数は、コントローラーで定義した@tweet = Tweet.new %>
+<%# 部分テンプレートを使用し、localsオプションで、@tweetをtweetに統一した。 %>
+<%# よって、modelの引数はtweetになっている。tweetsのnew.html.erbで確認できる %>
+
+<%# form_withを用いることで、投稿先のパスやHTTPメソッドを指定する必要がなくなる %>
+<%# ※1 ツイートを表示する際にアソシエーションを利用して投稿者のニックネームが表示されるようになったので、nameカラムは必要ない。 %>
+<%# したがって、投稿時に「Nickname」の値を入力する必要もない。 %>

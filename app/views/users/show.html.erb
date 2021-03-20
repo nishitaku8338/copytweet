@@ -4,26 +4,18 @@
 
   <%# ユーザーが投稿したツイートを全部表示させる %>
   <% @tweets.each do |tweet| %>
-    <div class="content_post" style="background-image: url(<%= tweet.image %>);">
-      
-      <%# プルダウンを表示する、編集と削除ボタンがある %>
-      <div class="more">
-        <span><%= image_tag 'arrow_top.png' %></span>  <%# プルダウンのアイコン画像を表示 %>
-        <%# プルダウンの中身 %>
-        <ul class="more_list">
-          <li>
-            <%= link_to '編集', edit_tweet_path(tweet.id), method: :get %>
-          </li>
-          <li>
-            <%= link_to '削除', tweet_path(tweet.id), method: :delete %>
-          </li>
-        </ul>
-      </div>
-      
-      <p><%= tweet.text %></p>
-      <%# nameカラムを削除したので、下記の記述は不要 %>
-      <%# <span class="name"><%= tweet.name %>
-      <%# </span> %>
-    </div>
+
+    <%# 部分テンプレート _tweet.html.erbファイルを呼び出す %>
+    <%= render partial: "tweets/tweet", locals: { tweet: tweet } %>
+  
   <% end %>
 </div>
+
+
+<%# renderは、部分テンプレートを呼び出すメソッド。
+partial: は、どの部分テンプレートを指定するオプション。
+今回の場合、_tweet.html.erbファイルを指定。 ⇢ render partial: "tweets/tweet"
+"tweets/tweet"の意味は、_tweet.html.erbファイルがtweetsディレクトリの中に在る為、tweets/tweetと記述する。
+異なるディレクトリ内の部分テンプレートを呼び出すときはtweets/tweetのように、どのディレクトリの部分テンプレートを使用しているかを明示的に記載する。
+localsは、部分テンプレート内でその変数を使えるようになる。
+今回の場合、locals: { ①tweet: ②tweet }は、①tweet:部分が変数。②tweet部分は、each文のブロック変数|tweet|のtweetである。 %>

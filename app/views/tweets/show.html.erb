@@ -2,7 +2,7 @@
   <div class="content_post" style="background-image: url(<%= @tweet.image %>);">
     
     <%# 投稿者本人か確認して表示を変える %>
-    <%= if user_signed_in? && current_user.id == @tweet.user_id %>  <%# ユーザーがログインしている 且つ 投稿したユーザーである投稿だけに許可 %>
+    <% if user_signed_in? && current_user.id == @tweet.user_id %>  <%# ユーザーがログインしている 且つ 投稿したユーザーである投稿だけに許可 %>
       <%# プルダウン機能 %>
       <div class="more">
         <span><%= image_tag 'arrow_top.png' %></span>  <%# プルダウンのアイコン画像を表示 %>
