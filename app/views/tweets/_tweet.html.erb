@@ -1,0 +1,50 @@
+<%# tweetsのindex.erb 部分テンプレート中身 %>
+
+<%# tweetは、each文のtweet %>
+<div class="content_post" style="background-image: url(<%= tweet.image %>);">
+      
+  <%# プルダウン機能 %>
+  <div class="more">
+    <span><%= image_tag 'arrow_top.png' %></span>  <%# プルダウンのアイコン画像を表示 %>
+    <%# プルダウンの中身 %>
+    <ul class="more_list">
+      <li>
+        <%= link_to '詳細', tweet_path(tweet.id), method: :get %>
+      </li>
+
+      <%# 投稿者本人か確認して表示を変える %>
+      <% if user_signed_in? && current_user.id == tweet.user_id %>  <%# ユーザーがログインしている 且つ 投稿したユーザーである投稿だけに許可 %>
+        <li>
+          <%= link_to '編集', edit_tweet_path(tweet.id), method: :get %>
+        </li>
+        <li>
+          <%= link_to '削除', tweet_path(tweet.id), method: :delete %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  
+  <p><%= tweet.text %></p>
+
+  <%# 投稿者となるユーザー名の表示 %>
+  <%# 投稿者のリンクをクリックすると、投稿者が投稿したツイートの一覧が表示されるページにアクセスする %>
+  <span class="name">
+    <%= link_to user_path(tweet.user.id) do %>
+      <span>投稿者</span><%= tweet.user.nickname %>
+    <% end %>
+
+    <%# <a href="/users/<%= tweet.user.id %>
+      <%# <span>投稿者</span><%= tweet.user.nickname %>
+    <%# </a> %>
+  </span>
+</div>
+
+
+<%# 投稿者本人か確認して表示を変える %>
+<%# current_user.id == tweet.user_idと記述することで、
+「現在ログインしているユーザー」と「ツイートを投稿したユーザー」が同じか否かを判定することができる。
+tweet.user_idという記述は、tweetとuserのアソシエーションによって成立している。
+if文中に複数の条件を定義する際に、論理演算子&&を用いていることも確認する。
+&&は論理演算子の1つ。
+条件A && 条件Bとなっていた場合、条件Aと条件Bが共に真の場合のみtrueが返され、その後の処理が実行される。
+反対に、条件Aと条件Bのどちらか、または双方が偽であった場合はfalseが返される。 %>
