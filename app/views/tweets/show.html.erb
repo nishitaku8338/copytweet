@@ -32,6 +32,36 @@
       <%# </a> %>
     </span>
   </div>
+
+  <%# コメント投稿用のフォーム %>
+  <div class="container">
+
+    <%# ユーザーがログインしている場合、コメントすることができる %>
+    <% if user_signed_in? %>
+      <%= form_with(model: [@tweet, @comment], local: true) do |f| %>
+      <%= f.text_area :text, placeholder: "コメントする", rows: "2" %>
+      <%= f.submit "投稿する" %>
+      <% end %>
+    <% else %>
+
+    <%# ユーザーがログインしていない場合、コメントはできない %>
+      <strong><p>※※※ コメントの投稿には新規登録/ログインが必要です ※※※</p></strong>
+    <% end %>
+
+    <%# コメント一覧を表示させる %>
+    <div class="comments">
+      <h4>＜コメント一覧＞</h4>
+      <% @comments.each do |comment| %>
+        <p>
+          <%# <strong><%= link_to comment.user.nickname, "/users/#{comment.user_id}" %><%#：</strong> %>
+          <strong><%= link_to comment.user.nickname, user_path(comment.user_id) %>：</strong>
+          <%= comment.text %>
+        </p>
+      <% end %>
+    </div>
+
+  </div>
+
 </div>
 
 <%# 基本的にはtweets/index.html.erbと同じ構造をしている。%>
@@ -42,3 +72,9 @@
 プルダウンメニューごと囲むことによって、
 「未ログイン時や自分の投稿ではないときは非表示」となるように書き換える。
 ログイン中ユーザーが投稿したツイートには、詳細ボタンに加えて「編集・削除ボタン」が表示される。 %>
+
+<%# @commentsには複数のコメントのレコードが入っているので、配列の形をとっている。
+そのため、ビューに表示させるためにはeachメソッドを使って、ひとつひとつのレコードに分解してから表示させる。
+また、コメントしたユーザーの名前をクリックしたら、そのユーザーのマイページへ遷移するようにする。
+そのために、名前のところへlink_toメソッドを使ってリンクを作成。
+ユーザーのidはcomment.user_idとパスに記述することで、コメントを投稿したユーザーのidをparamsで扱えるようにしている。 %>

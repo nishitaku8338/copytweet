@@ -39,6 +39,17 @@ class TweetsController < ApplicationController
 
   def show
     # @tweet = Tweet.find(params[:id])  # ツイート詳細画面に必要な情報を、findメソッドを用いてデータベースから取得
+    
+    # コメント機能：tweets/show.html.erbでform_withを使用して、
+    # comments#createを実行するリクエストを飛ばしたいので、@comment = Comment.newというインスタンス変数を生成する。
+    @comment = Comment.new
+
+    # tweetsテーブルとcommentsテーブルはアソシエーションが組まれているので、
+    # @tweet.commentsとすることで、@tweetへ投稿されたすべてのコメントを取得できる。
+    # また、ビューでは誰のコメントか明らかにするため、
+    # アソシエーションを使ってユーザーのレコードを取得する処理を繰り返す。
+    # そのときに「N+1問題」が発生してしまうので、includesメソッドを使って、N+1問題を解決
+    @comments = @tweet.comments.includes(:user)
   end
 
   private
