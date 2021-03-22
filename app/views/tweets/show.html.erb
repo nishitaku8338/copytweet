@@ -32,6 +32,23 @@
       <%# </a> %>
     </span>
   </div>
+
+  <%# コメント投稿用のフォーム %>
+  <div class="container">
+
+    <%# ユーザーがログインしている場合、コメントすることができる %>
+    <% if user_signed_in? %>
+      <%= form_with(model: [@tweet, @comment], local: true) do |f| %>
+      <%= f.text_area :text, placeholder: "コメントする", rows: "2" %>
+      <%= f.submit "投稿する" %>
+      <% end %>
+    <% else %>
+
+    <%# ユーザーがログインしていない場合、コメントはできない %>
+      <strong><p>※※※ コメントの投稿には新規登録/ログインが必要です ※※※</p></strong>
+    <% end %>
+  </div>
+
 </div>
 
 <%# 基本的にはtweets/index.html.erbと同じ構造をしている。%>
