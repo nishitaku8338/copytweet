@@ -4,7 +4,8 @@ class TweetsController < ApplicationController
 
   # ログイン状態によって、遷移できるページを制限する
   # indexアクション・showアクションは適用されない
-  before_action :move_to_index, except: [:index, :show]
+  # before_action :move_to_index, except: [:index, :show]
+  before_action :move_to_index, except: [:index, :show, :search]  # ※2 serachを追加
 
   def index
     # @tweets = Tweet.all  # データベースに保存されているすべてのデータを取得
@@ -52,6 +53,12 @@ class TweetsController < ApplicationController
     @comments = @tweet.comments.includes(:user)
   end
 
+  # 7つのアクション以外のアクション
+  def search  # Tweetモデルに書いたsearchメソッドを呼び出
+    # searchメソッドの引数にparams[:keyword]と記述して、検索結果を渡す
+    @tweets = Tweet.search(params[:keyword])
+  end
+
   private
   # tweet_paramsというストロングパラメーターを定義し、createメソッド・updateメソッドの引数に使用して、tweetsテーブルへ保存
   # require(モデル名)、permit(カラム名)。カラム名はマイグレーションファイルを参照する
@@ -79,3 +86,7 @@ end
 # 投稿時に「name」を入力する必要がなくなったので、それに合わせてtweetsコントローラーの処理も変更
 # nameカラムはもう使用しないので、ツイートの保存時にnameカラムへ情報を保存しないよう変更
 # permit(:name, :image, :text)から:nameを削除
+
+# ※2
+# 未ログイン時に検索をするとトップページへリダイレクトされる。
+# これを回避するために、before_actionのexceptオプションに:searchを追加

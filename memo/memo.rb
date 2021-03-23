@@ -717,3 +717,115 @@ end
 ルーティングをネストさせる一番の理由は、
 アソシエーション先のレコードのidをparamsに追加してコントローラーに送るため。
 今回の実装だと、コメントと結びつくツイートのidをparamsに追加する。
+
+
+
+検索機能の実装
+searchアクションのルーティングを設定
+searchという命名で、7つの基本アクション以外のアクションを定義
+
+collectionとmember
+collectionとmemberは、ルーティングを設定する際に使用できる。
+これを使用すると、生成されるルーティングのURLと実行されるコントローラーを任意にカスタムできる。
+
+collectionはルーティングに:idがつかない、
+memberは:idがつくという違いがある。
+【例】collectionで定義した場合
+Rails.application.routes.draw do
+  resources :tweets do
+    collection do
+      get 'search'
+    end
+  end
+end
+
+【例】collectionのルーティング
+Prefix           Verb    URI                                 Pattern
+search_tweets    GET    /tweets/search(.:format)              tweets#search
+
+※ルーティングに:idが付いていない
+
+【例】memberで定義した場合
+Rails.application.routes.draw do
+  resources :tweets do
+    member do
+      get 'search'
+    end
+  end
+end
+
+【例】memberのルーティング
+Prefix           Verb    URI                                 Pattern
+search_tweet      GET    /tweets/:id/search(.:format)       tweets#search
+
+URLの指定先が、collectionは:idなし、memberが:idありとなっていることが確認できる。
+今回の検索機能の場合、
+詳細ページのような:idを指定して特定のページにいく必要がないため、collectionを使用してルーティングを設定する。
+
+
+
+モデルに、検索する処理を記述したメソッドを定義する
+メソッド名はsearchメソッドとする。
+ビジネスロジックとは、データに対する処理などを行うプログラム処理のこと。
+具体的には、
+「データをどのように処理するのか」
+「どのデータを取得するのか」
+「どのような手順で処理をしていくのか」などを指す。
+
+searchメソッドをTweetモデルに定義
+検索したキーワードが含まれている投稿を取得するために、whereメソッドとLIKE句を利用する。
+
+
+whereメソッド
+モデルが使用できる、ActiveRecordメソッドの1つ。
+モデル.where(条件)のように、引数部分に条件を指定することで、
+テーブル内の「条件に一致したレコードのインスタンス」を配列の形で取得できる。
+引数の条件には、「検索対象となるカラム」を必ず含めて、条件式を記述する。
+【例】whereメソッド
+モデル.where('検索対象となるカラムを含む条件式')
+
+条件式には'カラム名 > 5'やキーバリューの形でカラム名: 値などの記述が可能。
+条件と一致する値を持つレコードを、すべて取得する。
+また、whereメソッドを連続して記述することによって、
+複数の条件に一致したレコードを取得することもできる。
+【例】
+# idが3未満のtweetsテーブルのインスタンスを配列で取得
+[1] pry(main)> Tweet.where('id < 3')
+=> [＃<Tweet id: 1, image: "test1.jpg", text: "いい景色だ。", created_at: "2014-12-06 00:00:00", updated_at: "2014-12-06 00:00:00", user_id: 1>,＃<Tweet id: 2, image: "test2.jpg", text: "Thank you!", created_at: "2014-12-07 00:00:00", updated_at: "2014-12-07 00:00:00", user_id: 2>]
+
+# idが3未満かつuser_idが1のtweetsテーブルのインスタンスを配列で取得
+[2] pry(main)> Tweet.where('id < 3').where(user_id: 1)
+=> [＃<Tweet id: 1, image: "test1.jpg", text: "いい景色だ。", created_at: "2014-12-06 00:00:00", updated_at: "2014-12-06 00:00:00", user_id: 1>]
+
+これで特定のレコードを取得することができる。
+さらに、検索機能にはwhereメソッドに加え、LIKE句を使用する。
+
+
+LIKE句
+LIKE句は、曖昧（あいまい）な文字列の検索をするときに使用するもので、whereメソッドと一緒に使う。
+曖昧な文字列の検索とは、
+たとえば「1文字目に'a'という文字列が入ったデータ」や
+「最後の文字に'b'が入っているデータ」、
+「文字列の途中に'c'が入ったデータ」などを検索するもの。
+
+曖昧文字列について
+文字列    意味
+%	       任意の文字列（空白文字列含む）
+_	       任意の1文字
+
+実行サンプル
+実行例                         詳細
+where('title LIKE(?)', "a%")  aから始まるタイトル
+where('title LIKE(?)', "%b")  bで終わるタイトル
+where('title LIKE(?)', "%c%") cが含まれるタイトル
+where('title LIKE(?)', "d_")  dで始まる2文字のタイトル
+where('title LIKE(?)', "_e")  eで終わる2文字のタイトル
+
+whereやLIKE句などの概念は使用する機会がたくさんある。
+また、ルーティングに対して、「このパスは可読性が高いか」などの視点を考え、
+collectionやmemberもしっかり理解する。
+
+要点チェック
+collectionとmemberは、ルーティングを設定する際に使用でき、生成されるURLとコントローラーを任意にカスタムできるメソッドのこと
+whereメソッドとは、ActiveRecordメソッドに属し、データを取得する際に条件をつけられるメソッドのこと
+曖昧な文字列の検索をする際は、LIKE句を用いること

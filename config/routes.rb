@@ -10,6 +10,10 @@ Rails.application.routes.draw do
   # resources :tweets   # resourcesは、7つのアクションをまとめてルーティングの設定ができる
   resources :tweets do  # ネストを利用したルーティングを設定
     resources :comments, only: :create  # 今回は「コメントを投稿する」機能、つまり「コメント情報を作る機能」を実装するのでcreateアクションのルーティングとする。
+    # 検索の機能のルーティングを作成
+    collection do
+      get 'search'
+    end
   end
 
   # ユーザーのルーティングを設定
@@ -23,3 +27,6 @@ end
 
 # doとendで挟むことにより、ルーティングの記述をネストさせることができる。
 # 「あるツイートに対してのコメント」という親子関係を表現したパスが、コメント投稿に必要なリクエストのパスになる。
+
+# 今回の検索機能の場合、
+# 詳細ページのような:idを指定して特定のページにいく必要がないため、collectionを使用してルーティングを設定。
