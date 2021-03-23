@@ -717,3 +717,47 @@ end
 ルーティングをネストさせる一番の理由は、
 アソシエーション先のレコードのidをparamsに追加してコントローラーに送るため。
 今回の実装だと、コメントと結びつくツイートのidをparamsに追加する。
+
+
+
+検索機能の実装
+searchアクションのルーティングを設定
+searchという命名で、7つの基本アクション以外のアクションを定義
+
+collectionとmember
+collectionとmemberは、ルーティングを設定する際に使用できる。
+これを使用すると、生成されるルーティングのURLと実行されるコントローラーを任意にカスタムできる。
+
+collectionはルーティングに:idがつかない、
+memberは:idがつくという違いがある。
+【例】collectionで定義した場合
+Rails.application.routes.draw do
+  resources :tweets do
+    collection do
+      get 'search'
+    end
+  end
+end
+
+【例】collectionのルーティング
+Prefix           Verb    URI                                 Pattern
+search_tweets    GET    /tweets/search(.:format)              tweets#search
+
+※ルーティングに:idが付いていない
+
+【例】memberで定義した場合
+Rails.application.routes.draw do
+  resources :tweets do
+    member do
+      get 'search'
+    end
+  end
+end
+
+【例】memberのルーティング
+Prefix           Verb    URI                                 Pattern
+search_tweet      GET    /tweets/:id/search(.:format)       tweets#search
+
+URLの指定先が、collectionは:idなし、memberが:idありとなっていることが確認できる。
+今回の検索機能の場合、
+詳細ページのような:idを指定して特定のページにいく必要がないため、collectionを使用してルーティングを設定する。
