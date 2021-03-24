@@ -888,3 +888,73 @@ Ruby on Railsでテストコードを書く際は、RSpecを使用すること�
 テストコードを書くことで、アプリケーションの品質が担保されるだけではなく、設計を読み解くこともできること
 テストコードは正常系と異常系に大きく分類されること
 テストコードは、単体テストコードと、結合テストコードの2種類があること
+
+
+
+Gemを追加
+RSpecのGemをPicTweetに導入
+Gemfile
+group :development, :test do
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'rspec-rails', '~> 4.0.0'  # これを追記
+end
+
+group :development, :testというグループの中に記述。
+そうすることで、Gemの動作に制限をもたせる。
+
+
+bundle installを実行
+ターミナル
+% cd ~/projects/pictweet #PicTweetのディレクトリへ移動
+% bundle install
+
+
+RSpecの設定
+アプリケーション内でRSpecを使用するための設定
+PicTweetにRSpecをインストール
+ターミナル
+% rails g rspec:install
+
+インストールが完了すると、以下のようにディレクトリやファイルが生成される。
+【例】ターミナル
+create  .rspec
+create  spec
+create  spec/spec_helper.rb
+create  spec/rails_helper.rb
+
+.rspecに設定を追加
+生成された.rspecファイルを開き、以下のように記述。
+この記述は、テストコードの結果をターミナル上に可視化するための記述。
+.rspec
+--require spec_helper
+--format documentation # これを追加
+
+これでRSpecの設定は完了
+
+
+テストコードを記述するファイルを用意
+コマンドでファイルを生成することで、テストコードの雛形があらかじめ記載されたファイルを生成することができる。
+ターミナル
+% rails g rspec:model user
+
+以下のように表示されていれば、ファイルは生成されている。
+【例】
+create  spec/models/user_spec.rb
+
+生成されたファイルの1行目に、以下の記述があることを確認する。
+spec/models/user_spec.rb
+require 'rails_helper'  # ここを確認する
+
+RSpec.describe User, type: :model do
+  pending "add some examples to (or delete) #{__FILE__}"
+end
+
+RSpecでモデル、ビュー、コントローラーのテストを行うためには、rails_helper.rbというファイルを読み込む必要がある。
+require 'rails_helper'と記述することで、ファイルを読み込んでくれる。
+
+
+rails_helper
+Rspecを用いてRailsの機能をテストするときに、共通の設定を書いておくファイル。
+各テスト用ファイルでspec/rails_helper.rbを読み込むことで、共通の設定やメソッドを適用する。
+rails gコマンドでテストファイルを生成すると、rails_helperを読み込む記述が、自動的追加される。
