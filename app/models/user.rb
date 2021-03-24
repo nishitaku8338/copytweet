@@ -4,8 +4,12 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  # アソシエーション
   has_many :tweets    # tweetsテーブルとのアソシエーション(1対多)
   has_many :comments  # commentsテーブルとのアソシエーション
+
+  # バリデーション
+  validates: nickname, presence: true
 end
 
 
