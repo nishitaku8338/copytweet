@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_many :comments  # commentsテーブルとのアソシエーション
 
   # バリデーション
-  validates: nickname, presence: true
+  validates :nickname, presence: true
 end
 
 
