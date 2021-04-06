@@ -4,12 +4,18 @@ RSpec.describe User, type: :model do
   describe 'ユーザー新規登録' do
     it 'nicknameが空では登録できない' do
       # nicknameが空では登録できないテストコードを記述します
+      # nicknameの値が空のインスタンスを生成
+      user = User.new(nickname: '', email: 'test@example', password: '000000', password_confirmation: '000000')
     end
     it 'emailが空では登録できない' do
       # emailが空では登録できないテストコードを記述します
     end
   end
 end
+
+
+# テストコードを実行
+# % bundle exec rspec spec/models/user_spec.rb
 
 
 # rails_helper
@@ -41,5 +47,22 @@ end
 # specディレクトリ以下に書かれたRSpecのテストコードを実行するコマンド。
 # 実行するファイルを指定することも可能。
 
-# テストコードを実行
-# % bundle exec rspec spec/models/user_spec.rb
+
+
+# nicknameが空の場合の記述
+# 異常系のモデル単体テストの実装は、以下の流れで進み
+# 1,保存するデータ（インスタンス）を作成する
+# 2,作成したデータ（インスタンス）が、保存されるかどうかを確認する
+# 3,保存されない場合、生成されるエラーメッセージが想定されるものかどうかを確認する
+# nicknameとemailのテスト実装を通して、この流れを理解
+
+nicknameの値が空のインスタンスを生成
+nicknameに設定されているpresence: tureが正常に機能するか検証するため、
+バリデーションを実行します。バリデーションはDBに保存する前しか実行されません。
+そこで、valid?メソッドを用いて、任意のタイミングでバリデーションを実行しましょう。
+
+
+valid?
+valid?は、バリデーションを実行させて、エラーがあるかどうかを判断するメソッド。
+エラーがない場合はtrueを、ある場合はfalseを返します。
+また、エラーがあると判断された場合は、エラーの内容を示すエラーメッセージを生成。
