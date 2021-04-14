@@ -7,7 +7,9 @@
       <%# ニックネームのカラムを追加 %>
       <div class="field">
         <%= f.label :ニックネーム %> <em>(6文字まで)</em><br />
-        <%= f.text_field :nickname, autofocus: true, maxlength: "6" %>  <%# 最大6文字に制限 %>
+        <%# 最大６文字に制限 %>
+        <%# <%= f.text_field :nickname, autofocus: true, maxlength: "6" %>
+        <%= f.text_field :nickname, autofocus: true %>
       </div>
 
       <div class="field">
