@@ -6,28 +6,71 @@ RSpec.describe User, type: :model do
   end
 
   describe 'ユーザー新規登録' do
-    it 'nicknameが空では登録できない' do
-      # nicknameが空では登録できないテストコードを記述します
-      # nicknameの値が空のインスタンスを生成
-      # user = User.new(nickname: '', email: 'test@example', password: '000000', password_confirmation: '000000')
-      # user = FactoryBot.build(:user)  # Userのインスタンス生成
-      # user.nickname = ''  # nicknameの値を空にする
-      # user.valid?
-      # expect(user.errors.full_messages).to include("Nickname can't be blank")
-      @user.nickname = ''
-      @user.valid?
-      expect(@user.errors.full_messages).to include "Nickname can't be blank"
+    context '新規登録できるとき' do
+      it 'nicknameとemail,passwordとpassword_confirmationが存在すれば登録できる' do
+        @user.nickname = 'aaaaaa'
+        expect(@user).to be_valid
+      end
+      it 'nicknameが6文字以下であれば登録できる' do
+      end
+      it 'passwordとpassword_confirmationが6文字以上であれば登録できる' do
+        @user.password = '000000'
+        @user.password_confirmation = '000000'
+        expect(@user).to be_valid
+      end
     end
-    it 'emailが空では登録できない' do
-      # emailが空では登録できないテストコードを記述します
-      # user = User.new(nickname: 'test', email: '', password: '000000', password_confirmation: '000000')
-      # user = FactoryBot.build(:user)  # Userのインスタンスを生成
-      # user.email = ''  # emailの値を空にする
-      # user.valid?
-      # expect(user.errors.full_messages).to include("Email can't be blank")
-      @user.email = ''
-      @user.valid?
-      expect(@user.errors.full_messages).to include "Email can't be blank"
+    context '新規登録できないとき' do
+      it 'nicknameが空では登録できない' do
+        # nicknameが空では登録できないテストコードを記述します
+        # nicknameの値が空のインスタンスを生成
+        # user = User.new(nickname: '', email: 'test@example', password: '000000', password_confirmation: '000000')
+        # user = FactoryBot.build(:user)  # Userのインスタンス生成
+        # user.nickname = ''  # nicknameの値を空にする
+        # user.valid?
+        # expect(user.errors.full_messages).to include("Nickname can't be blank")
+        @user.nickname = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include("Nickname can't be blank")
+      end
+      it 'emailが空では登録できない' do
+        # emailが空では登録できないテストコードを記述します
+        # user = User.new(nickname: 'test', email: '', password: '000000', password_confirmation: '000000')
+        # user = FactoryBot.build(:user)  # Userのインスタンスを生成
+        # user.email = ''  # emailの値を空にする
+        # user.valid?
+        # expect(user.errors.full_messages).to include("Email can't be blank")
+        @user.email = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include("Email can't be blank")
+      end
+      it 'passwordが空では登録できない' do
+        @user.password = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include("Password can't be blank")
+      end
+      it 'passwordが存在してもpassword_confirmationが空では登録できない' do
+        @user.password_confirmation = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include("Password confirmation doesn't match Password")
+      end
+      it 'nicknameが7文字以上では登録できない' do
+        @user.nickname = 'aaaaaaa'
+        @user.valid?
+        expect(@user.errors.full_messages).to include('Nickname is too long (maximum is 6 characters)')
+      end
+      it '重複したemailが存在する場合登録できない' do
+        @user.save
+        another_user = FactoryBot.build(:user)
+        another_user.email = @user.email
+        another_user.valid?
+        expect(another_user.errors.full_messages).to include('Email has already been taken')
+      end
+      it 'passwordが5文字以下では登録できない' do
+        @user.password = '00000'
+        @user.password_confirmation = '00000'
+        @user.valid?
+        expect(@user.errors.full_messages).to include('Password is too short (minimum is 6 characters)')
+      end
     end
   end
 end
@@ -166,3 +209,13 @@ end
 
 # nicknameでpresence: trueによるエラーが起こるはずであるため、
 # 想定するエラーメッセージは"Nickname can't be blank"が適切です。
+
+# be_valid
+# be_validとは、valid?メソッドの返り値が、trueであることを期待するマッチャ
+# expectの引数に指定されたインスタンスが、
+# バリデーションでエラーにならないものであれば、valid?の返り値はtrueとなりテストは成功
+
+# context
+# contextは、特定の条件を指定してグループを分けます。
+# 使用方法はdescribeと同じですが、
+# describeには何についてのテストなのかを指定するのに対し、contextには特定の条件を指定します。

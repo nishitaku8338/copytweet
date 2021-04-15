@@ -9,7 +9,9 @@ class User < ApplicationRecord
   has_many :comments  # commentsテーブルとのアソシエーション
 
   # バリデーション
-  validates :nickname, presence: true
+  # validates :nickname, presence: true
+  # 「保存できる値は最大6文字まで」というバリデーションを設置
+  validates :nickname, presence: true, length: { maximum: 6 }
 end
 
 
