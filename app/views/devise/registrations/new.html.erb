@@ -6,19 +6,19 @@
 
       <%# ニックネームのカラムを追加 %>
       <div class="field">
-        <%= f.label :ニックネーム %> <em>(6文字まで)</em><br />
+        <%= f.label :nickname %> <em>(6文字まで)</em><br />
         <%# 最大６文字に制限 %>
         <%# <%= f.text_field :nickname, autofocus: true, maxlength: "6" %>
         <%= f.text_field :nickname, autofocus: true %>
       </div>
 
       <div class="field">
-        <%= f.label :メールアドレス %><br />
+        <%= f.label :email %><br />
         <%= f.email_field :email %>
       </div>
 
       <div class="field">
-        <%= f.label :パスワード %>
+        <%= f.label :password %>
         <% if @minimum_password_length %>
           <em>(<%= @minimum_password_length %> characters minimum)</em>
         <% end %><br />
@@ -26,7 +26,7 @@
       </div>
 
       <div class="field">
-        <%= f.label :パスワード確認入力 %><br />
+        <%= f.label :password_confirmation %><br />
         <%= f.password_field :password_confirmation, autocomplete: "off" %>
       </div>
 
