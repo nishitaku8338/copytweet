@@ -24,6 +24,17 @@ describe TweetsController, type: :request do
     end
   end
 
+  describe 'GET #show' do
+    it 'showアクションにリクエストすると正常にレスポンスが返ってくる' do 
+    end
+    it 'showアクションにリクエストするとレスポンスに投稿済みのツイートのテキストが存在する' do 
+    end
+    it 'showアクションにリクエストするとレスポンスに投稿済みのツイートの画像URLが存在する' do 
+    end
+    it 'showアクションにリクエストするとレスポンスにコメント一覧表示部分が存在する' do 
+    end
+  end
+
 end
 
 # bundle exec rspec spec/requests/tweets_request_spec.rb
