@@ -1163,3 +1163,143 @@ FakerのGemを使用すると、メールアドレス、人名、パスワード
 要点チェック
 contextとは、「テストを行いたい特定の条件」を記述するメソッドであること
 be_validとは、バリデーション実行時の返り値がtrueであることを確かめるマッチャであること
+
+
+コントローラーの単体テストコード
+テストコードの種類	テストコードを書く方針
+モデル	インスタンスを生成し、それがモデルに規定したどおりの挙動になるか（たとえば、バリデーションが正しく働くか）を確かめる
+コントローラー	あるアクションにリクエストを送ったとき、想定通りのレスポンスが生成されるかどうかを確かめる
+
+コントローラーのテストコードでは、
+「リクエストとレスポンス」に着目したテストコードを記述します。
+この時に、RSpecの中でもRequest Specと呼ばれる手法を利用します。
+
+Request Spec
+RSpecが提供している、コントローラーのテストコードを書くために特化した手法です。
+RSpecの導入が完了していれば使用できます。
+
+なお、コントローラーのテストコードは、
+次章で学ぶ結合テストコードに記述する内容と、同じような責務を果たすことが多いです。
+したがって、本章では簡単に限られたコントローラーの機能を確認することにします。
+
+create
+ActiveRecordのcreateメソッドと同様の意味を持ちます。
+buildとほぼ同じ働きをしますが、createの場合はテスト用のDBに値が保存されます。
+注意すべき点として、1回のテストが実行され、終了する毎にテスト用のDBの内容がロールバックされます。（保存された値がすべて消去されてしまう）
+
+それでは、各exampleをコードに落とし込みましょう。
+
+
+
+正常にレスポンスが返ってくることを確かめよう
+まず、「indexアクションにリクエストすると正常にレスポンスが返ってくる」ことを確かめます。
+テストコードにおいては最初に、「indexアクションにリクエストすると」を行う記述をします。
+その時に使用するものがgetです。
+
+get
+get 〇〇_pathのように、
+どこのパスにリクエストを送りたいかを記述します。
+どのアクションがどのパスに対応しているかは、
+以下のようにrails routesコマンドで確かめることはすでに学習済みです。
+【例】ターミナル
+% rails routes
+
+Prefix          Verb    URIPattern                    Controller#Action
+root            GET     /                             tweets#index
+tweet_comments  POST    /tweets/:tweet_id/comments    comments#create
+search_tweets   GET     /tweets/search                tweets#search
+tweets          GET     /tweets                       tweets#index
+                POST    /tweets                       tweets#create
+new_tweet       GET     /tweets/new                   tweets#new
+
+#前後省略
+
+今回はindexアクションにリクエストを送るため、get root_pathとすると良いでしょう。
+
+
+response
+リクエストに対するレスポンスそのものが含まれます。
+このレスポンスで取得できる情報に、想定する内容が含まれているかを確認することで、
+テストコードを書くことができます。
+
+
+レスポンスを確認しましょう
+binding.pryで停止しているところに、
+responseと入力してエンターキーを押下しましょう。
+するとレスポンスとしてたくさんの情報が表示されるはずです。
+ターミナル
+
+=> #<ActionDispatch::TestResponse:0x00007fe4ba5b45e0
+@cache_control={:max_age=>"0", :private=>true, :must_revalidate=>true},
+@committed=false,
+@cv=#<MonitorMixin::ConditionVariable:0x00007fe4ba5b44a0 @cond=#<Thread::ConditionVariable:0x00007fe4ba5b4478>, @monitor=#<ActionDispatch::TestResponse:0x00007fe4ba5b45e0 ...>>,
+@header=
+{"X-Frame-Options"=>"SAMEORIGIN",
+  "X-XSS-Protection"=>"1; mode=block",
+  "X-Content-Type-Options"=>"nosniff",
+  "X-Download-Options"=>"noopen",
+  "X-Permitted-Cross-Domain-Policies"=>"none",
+  "Referrer-Policy"=>"strict-origin-when-cross-origin",
+  "Content-Type"=>"text/html; charset=utf-8",
+  "ETag"=>"W/\"07b471bc4b0f822d1d74886c0cd36998\"",
+  "Cache-Control"=>"max-age=0, private, must-revalidate",
+  "X-Request-Id"=>"e0aea9ae-5622-4a8a-9cfc-13fa1eaaddf3",
+  "X-Runtime"=>"2.913438",
+  "Content-Length"=>"154958"},
+@mon_count=0,
+@mon_mutex=#<Thread::Mutex:0x00007fe4ba5b4590>,
+@mon_mutex_owner_object_id=70310177907440,
+@mon_owner=nil,
+
+#以下省略
+長過ぎるため一度に表示されません。
+十字キーの↓を入力すると続きを確認できます。
+Qを押下すると終了して次の入力画面に移行できます。
+
+ここから、「正常なレスポンスかどうか」を判断する必要があります。
+それを判断するためには、HTTPステータスコードで判別します。
+
+
+HTTPステータスコード
+HTTP通信において、どのような処理の結果となったのかを示すものです。以下のような分類になっています。
+ステータスコード	 内容
+100~	          処理の継続中
+200~	          処理の成功
+300~	          リダイレクト
+400~	          クライアントのエラー
+500~	          サーバーのエラー
+
+今回は正常にレスポンスを得ることを確かめたいため、200というステータスコードを期待します。
+レスポンスの中からステータスコードを確かめるためには、statusを利用します。
+
+
+status
+response.statusと実行することによって、そのレスポンスのステータスコードを出力できます。
+
+
+ステータスコードを確認しましょう
+binding.pryで停止しているところに、
+response.statusと入力してエンターキーを押下しましょう。
+するとレスポンスのステータスコードが出力されます。
+ターミナル
+[2] pry(#<RSpec::ExampleGroups::TweetsController::GETIndex>)> response.status
+=> 200
+
+上記のように、200が確認できれば成功です。
+上記を踏まえて、正常なレスポンスが返ってくることを確かめるテストコードを記述しましょう。
+
+
+投稿済みのツイートがレスポンスに含まれることを確認しよう
+続いて、「レスポンスに投稿済みのツイートのテキストが存在する」を確かめるテストコードを記述します。
+先ほど学んだresponseの中に、ブラウザ上に表示される記述があります。それはbodyと呼ばれます。
+
+body
+response.bodyと記述すると、ブラウザに表示されるHTMLの情報を抜き出すことができます。
+
+
+要点チェック
+Request Specはコントローラーのテストコードを書くことに特化している手法であること
+getでリクエストを送りたいパスを指定すること
+responseにリクエストに対するレスポンスが含まれること
+response.statusでステータスコードの確認が出来ること
+bodyとは、ブラウザに表示されているHTML情報のこと

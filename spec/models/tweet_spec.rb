@@ -29,3 +29,5 @@ RSpec.describe Tweet, type: :model do
     end
   end
 end
+
+# bundle exec rspec spec/models/tweet_spec.rb
