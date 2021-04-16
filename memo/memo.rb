@@ -1303,3 +1303,30 @@ getでリクエストを送りたいパスを指定すること
 responseにリクエストに対するレスポンスが含まれること
 response.statusでステータスコードの確認が出来ること
 bodyとは、ブラウザに表示されているHTML情報のこと
+
+
+
+結合テストコードの概要
+結合テストコードを実行するためには、System Specという技術を使用します。
+
+System Spec
+System Spec（システムスペック）は結合テストコードを記述するための仕組みのことを言います。
+大枠の記述はこれまでのRSpecと変わりません。
+
+System Specを記述するためには、CapybaraというGemを用います。
+これはすでにデフォルトでRuby on Railsに搭載されています。
+
+
+Capybara
+Capybara（カピバラ）はSystem Specを記述するために必要なGemです。
+以下のようにGemfileに標準で記載されています。すなわち導入済みです。
+【例】Gemfile
+group :test do
+  # Adds support for Capybara system testing and selenium driver
+  gem 'capybara', '>= 2.15'
+  gem 'selenium-webdriver'
+  # Easy installation and use of web drivers to run system tests with browsers
+  gem 'webdrivers'
+end
+
+
