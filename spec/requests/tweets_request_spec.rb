@@ -38,7 +38,8 @@ describe TweetsController, type: :request do
       expect(response.body).to include(@tweet.text)
     end
     it 'showアクションにリクエストするとレスポンスにコメント一覧表示部分が存在する' do 
-      
+      get tweet_path(@tweet)
+      expect(response.body).to include('＜コメント一覧＞')
     end
   end
 
