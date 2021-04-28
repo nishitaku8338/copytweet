@@ -1,5 +1,6 @@
 class Tweet < ApplicationRecord
-  validates :text, presence: true  # 空のツイートは登録できない。
+  # imageも空で投稿できないように追記
+  validates :text, :image, presence: true  # 空のツイートは登録できない。
 
   belongs_to :user    # usersテーブルとのアソシエーション(1対1)
   has_many :comments  # commentsテーブルとのアソシエーション
