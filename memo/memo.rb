@@ -1475,3 +1475,10 @@ exampleを整理しよう
 ユーザー新規登録の時はユーザー情報の生成のみを行うためFactoryBot.build(:user)としていました。
 一方、今回はログイン、
 すなわちすでに登録されているユーザーに対しての挙動を確認するためFactoryBot.create(:user)としています。
+
+
+
+have_selector
+指定したセレクタが存在するかどうかを判断するマッチャです。
+have_selector ".content_post[style='background-image: url(#{@tweet_image});']"という形で記述できます。
+
