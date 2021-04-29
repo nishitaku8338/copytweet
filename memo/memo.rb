@@ -1798,3 +1798,127 @@ ja:
 
 ここまでの設定や記述によって、
 新規登録画面、ログイン画面、投稿画面の全てのエラーメッセージが日本語で表示されるようになりました。
+
+
+
+テストコードの書き換え
+エラーメッセージ を日本語に変更したということは、
+単体テストコードの中で使用している期待するエラーメッセージも日本語に変わるので、
+そちらも変更しましょう。
+
+現状のテストコードを確かめよう
+エラーメッセージが日本語に変わったということは、
+現状のテストコードではうまく検証ができません。
+現状のテストコードは英語のエラーメッセージが出現する前提で記述しているためです。
+
+両モデルのエラーの原因は同じです。
+原因を説明すると、エラーメッセージを日本語にしたものの、
+テストコードで期待するエラーメッセージがまだ英語になっているためです。
+したがって、この英語のエラーメッセージを日本語のエラーメッセージに書き換える必要があります。
+
+※Tweetモデルの失敗原因
+
+1) テキストのみであればツイートは保存される
+→Tweetモデルのバリデーションにimageも追記したので、
+textとimageの両方の入力がないとツイートが保存できないようになっています。
+したがって、このように失敗します。
+
+
+単体テストコードを日本語に書き換えよう
+UserモデルとTweetモデルの単体テストコードに記述してある、
+英語のエラーメッセージを日本語に変更します。
+
+
+Userモデルの単体テストを書き換えましょう
+expect(@user.errors.full_messages).to include('英語のエラーメッセージ')の部分を
+('日本語のエラーメッセージ')に変更します。
+spec/models/user_spec.rb
+require 'rails_helper'
+describe User do
+  before do
+    @user = FactoryBot.build(:user)
+  end
+
+  describe 'ユーザー新規登録' do
+    context '新規登録がうまくいくとき' do
+      it 'nicknameとemail、passwordとpassword_confirmationが存在すれば登録できる' do
+        expect(@user).to be_valid
+      end
+      it 'nicknameが6文字以下では登録できる' do
+        @user.nickname = 'aaaaaa'
+        expect(@user).to be_valid
+      end
+      it 'passwordが6文字以上であれば登録できる' do
+        @user.password = '000000'
+        @user.password_confirmation = '000000'
+        expect(@user).to be_valid
+      end
+    end
+
+    context '新規登録がうまくいかないとき' do
+      it 'nicknameが空だと登録できない' do
+        @user.nickname = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('ニックネームを入力してください')
+      end
+      it 'nicknameが7文字以上であれば登録できない' do
+        @user.nickname = 'aaaaaaa'
+        @user.valid?
+        expect(@user.errors.full_messages).to include('ニックネームは6文字以内で入力してください')
+      end
+      it 'emailが空では登録できない' do
+        @user.email = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('Eメールを入力してください')
+      end
+      it '重複したemailが存在する場合登録できない' do
+        @user.save
+        another_user = FactoryBot.build(:user)
+        another_user.email = @user.email
+        another_user.valid?
+        expect(another_user.errors.full_messages).to include('Eメールはすでに存在します')
+      end
+      it 'passwordが空では登録できない' do
+        @user.password = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('パスワードを入力してください')
+      end
+      it 'passwordが5文字以下であれば登録できない' do
+        @user.password = '00000'
+        @user.password_confirmation = '00000'
+        @user.valid?
+        expect(@user.errors.full_messages).to include('パスワードは6文字以上で入力してください')
+      end
+      it 'passwordが存在してもpassword_confirmationが空では登録できない' do
+        @user.password_confirmation = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('パスワード（確認用）とパスワードの入力が一致しません')
+      end
+    end
+  end
+end
+
+
+テストコードを実行しましょう
+ターミナル
+bundle exec rspec spec/models/user_spec.rb 
+
+以下のログのようにテストがすべてパスしていれば成功です。
+ターミナル
+User
+  ユーザー新規登録
+    新規登録がうまくいくとき
+      nicknameとemail、passwordとpassword_confirmationが存在すれば登録できる
+      nicknameが6文字以下では登録できる
+      passwordが6文字以上であれば登録できる
+    新規登録がうまくいかないとき
+      nicknameが空だと登録できない
+      nicknameが7文字以上であれば登録できない
+      emailが空では登録できない
+      重複したemailが存在する場合登録できない
+      passwordが空では登録できない
+      passwordが5文字以下であれば登録できない
+      passwordが存在してもpassword_confirmationが空では登録できない
+
+Finished in 10.4 seconds (files took 7.39 seconds to load)
+10 examples, 0 failures
