@@ -1922,3 +1922,88 @@ User
 
 Finished in 10.4 seconds (files took 7.39 seconds to load)
 10 examples, 0 failures
+
+
+
+Tweetモデルの単体テストを書き換えましょう
+Userモデルの変更と同じく
+expect(@user.errors.full_messages).to include('英語のエラーメッセージ')の部分を('日本語のエラーメッセージ')に変更します。
+
+Tweetモデルには、バリデーションにimageを追記したので、textとimage両方の入力が
+ないとツイートが保存できないようになっています。
+したがって、'テキストのみであればツイートは保存される'の部分は、
+コメントアウトか削除をしましょう。そして、imageについてのテストを追加しています。
+
+spec/models/tweet_spec.rb
+require 'rails_helper'
+
+RSpec.describe Tweet, type: :model do
+  before do
+    @tweet = FactoryBot.build(:tweet)
+  end
+
+  describe 'ツイートの保存' do
+    context 'ツイートが保存できる場合' do
+      it '画像とテキストがあればツイートは保存される' do
+        expect(@tweet).to be_valid
+      end
+
+      # ↓↓下記はコメントアウトか削除↓↓
+      # it 'テキストのみであればツイートは保存される' do
+      #   @tweet.image = ''
+      #   expect(@tweet).to be_valid
+      # end
+    end
+
+    context 'ツイートが保存できない場合' do
+      it 'テキストがないとツイートは保存できない' do
+        @tweet.text = ''
+        @tweet.valid?
+        expect(@tweet.errors.full_messages).to include('テキストを入力してください')
+      end
+      it '画像がないとツイートは保存できない' do
+        @tweet.image = nil
+        @tweet.valid?
+        expect(@tweet.errors.full_messages).to include('画像を入力してください')
+      end
+      it 'ユーザーが紐付いていないとツイートは保存できない' do
+        @tweet.user = nil
+        @tweet.valid?
+        expect(@tweet.errors.full_messages).to include('Userを入力してください')
+      end
+    end
+  end
+end
+
+35行目のexpect(@tweet.errors.full_messages).to include('Userを入力してください')
+のUserは、今回ja.ymlに記述してないので、Userのままで問題ありません。
+
+
+テストコードを実行しましょう
+ターミナル
+bundle exec rspec spec/models/tweet_spec.rb
+
+以下のログのようにテストがすべてパスしていれば成功です。
+ターミナル
+Tweet
+  ツイートの保存
+    ツイートが保存できる場合
+      画像とテキストがあればツイートは保存される
+    ツイートが保存できない場合
+      テキストがないとツイートは保存できない
+      画像がないとツイートは保存できない
+      ユーザーが紐付いていないとツイートは保存できない
+
+Finished in 0.64743 seconds (files took 4.05 seconds to load)
+4 examples, 0 failures
+
+ここまで記述し、テストコードが正常に通ったら完了です。
+
+
+要点チェック
+設定を変更すると、エラーメッセージを英語から日本語に変換できること
+rails-i18nは、日本語に対応できるgemであること
+localeファイルとは、様々な言語に対応できる言語ファイルであること
+YAMLとは、中身が文字だけで記述されているプログラムであること
+devise.ja.ymlとは、deviseを用いて導入したユーザー管理機能のエラーメッセージを日本語化するファイルであること
+ja.ymlとは、アプリケーション上の英語を日本語へ変換するファイルであること
