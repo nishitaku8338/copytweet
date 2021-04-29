@@ -1616,3 +1616,37 @@ app/views/tweets/new.html.erb
 
 ここまでで、投稿画面で画像とテキストを何も入力せず投稿した場合に、
 エラーメッセージが表示される設定が完了しました。
+
+
+
+Tweetのログイン画面を編集
+次に、ログイン画面です。
+ログイン画面で、EmailとPasswordに何も入力せず投稿した場合にエラーメッセージが表示される設定を、
+以下の手順に沿って実装していきましょう。
+
+新規登録には、deviseの機能で初めからエラーメッセージが表示される機能が備わっています。
+ビューを編集しましょう
+devise/sessions/new.html.erbを以下のように編集
+app/views/devise/sessions/new.html.erb
+<%# ログイン時のエラーメッセージ  %>
+<div class="contents row">
+  <div class="container">
+    <h2>Log in</h2>
+    # <div class='login-flash-message'>
+    #   <%= flash[:notice] %>
+    #   <%= flash[:alert] %>
+    # </div>
+    # <%= form_with model: @user, url: user_session_path, id: 'new_user', class: 'new_user', local: true do |f| %>
+
+    中略
+
+これで事前準備は完了
+
+
+現状を確認
+編集が完了したので、エラーメッセージが表示されるか確認してみましょう。
+
+ブラウザで確認
+サーバーを起動し、localhost:3000に接続して、
+それぞれの画面でフォームに何も入力せず送信ボタンを押した場合の挙動を確かめてみましょう。
+
