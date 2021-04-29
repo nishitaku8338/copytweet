@@ -1516,3 +1516,494 @@ have_selectorを使用すると、指定したセレクタが存在するか判�
 have_linkを使用すると、要素の中に当てはまるリンクがあることを確認できること
 allを使用すると、pageに存在する同名のクラスを持つ要素をまとめて取得できること
 find_link().clickを使用すると、a要素で表示されているリンクをクリックできること
+
+
+
+日本語対応をする
+アプリケーションのエラーメッセージを日本語化しよう
+
+概要
+本章では、PicTweetを例に、
+ユーザー登録やツイート投稿画面の入力フォームが空だった場合に表示されるエラーメッセージを、
+英語から日本語に変換する方法を学びます。
+どのような設定、記述を行うと日本語のエラーメッセージに変換されるのかを、順を追って説明していきます。
+
+
+目的
+エラーメッセージの表示方法を学ぶこと
+ファイルの言語設定について理解すること
+英語を日本語に変換する方法を学ぶこと
+
+
+事前準備
+事前準備として、PicTweetを例に、まずは英語でエラーメッセージを表示させる機能を実装していきます。
+現状、投稿画面とログイン画面は、
+入力フォームが空だった場合にエラー内容が何も表示されない仕様になっていますので、
+エラーメッセージを表示させる記述をしていきます。
+
+
+投稿画面を編集
+投稿画面で画像とテキストに何も入力せず投稿した場合に、エラーメッセージが表示される設定
+
+モデルを編集
+テキストに加え、画像も空では投稿できないように、バリデーションを追記
+app/models/tweet.rb
+class Tweet < ApplicationRecord
+  belongs_to :user
+  has_many :comments 
+
+  # imageも空で投稿できないように追記
+  validates :text, :image, presence: true
+
+  # 以下省略
+
+end
+
+
+コントローラーを編集
+createアクションの中にツイートが保存される場合の条件分岐を追記します。
+@tweetを定義し、valild?メソッドを使用してツイートが保存されなければ、newへ戻る記述をします。
+
+app/controllers/tweets_controller.rb
+#中略
+def create
+  @tweet = Tweet.new(tweet_params)
+  #バリデーションで問題があれば、保存はされず「投稿画面」に戻る
+  if @tweet.valid?
+    @tweet.save
+    redirect_to root_path
+  else
+    #保存されなければ、newに戻る
+    render 'new'
+  end
+end
+
+
+ビューを編集しましょう
+エラーメッセージのビューを作成します。
+views/layoutsの下に_error_messages.html.erbファイルを自作しましょう。
+
+どのモデルのバリデーションにも対応できるように、if文にmodel.errors.any? を記述します。
+app/views/layouts/_error_messages.html.erb
+<% if model.errors.any? %>
+  <div class="error-alert">
+  <ul>
+    <% model.errors.full_messages.each do |message| %>
+    <li class='error-message'><%= message %></li>
+    <% end %>
+  </ul>
+  </div>
+# <% end %>
+
+
+次に、エラーメッセージを表示させる部分に以下のような記述をしましょう。
+ツイートが保存されなかった場合、
+# <%= render 'layouts/error_messages', model: form.object %>が読み込まれエラーメッセージが表示されます。
+
+app/views/tweets/new.html.erb
+<div class="contents row">
+  <div class="container">
+    <%= form_with(model: @tweet, local: true) do |form| %>
+      <h3>
+        投稿する
+      </h3>
+      <%= render 'layouts/error_messages', model: form.object %>
+      <%= render partial: "form", locals: { form: form } %>
+    <% end %>
+  </div>
+</div>
+
+
+ここまでで、投稿画面で画像とテキストを何も入力せず投稿した場合に、
+エラーメッセージが表示される設定が完了しました。
+
+
+
+Tweetのログイン画面を編集
+次に、ログイン画面です。
+ログイン画面で、EmailとPasswordに何も入力せず投稿した場合にエラーメッセージが表示される設定を、
+以下の手順に沿って実装していきましょう。
+
+新規登録には、deviseの機能で初めからエラーメッセージが表示される機能が備わっています。
+ビューを編集しましょう
+devise/sessions/new.html.erbを以下のように編集
+app/views/devise/sessions/new.html.erb
+<%# ログイン時のエラーメッセージ  %>
+<div class="contents row">
+  <div class="container">
+    <h2>Log in</h2>
+    # <div class='login-flash-message'>
+    #   <%= flash[:notice] %>
+    #   <%= flash[:alert] %>
+    # </div>
+    # <%= form_with model: @user, url: user_session_path, id: 'new_user', class: 'new_user', local: true do |f| %>
+
+    中略
+
+これで事前準備は完了
+
+
+現状を確認
+編集が完了したので、エラーメッセージが表示されるか確認してみましょう。
+
+ブラウザで確認
+サーバーを起動し、localhost:3000に接続して、
+それぞれの画面でフォームに何も入力せず送信ボタンを押した場合の挙動を確かめてみましょう。
+
+
+エラーメッセージの日本語化
+日本語化の設定をしよう
+英語から日本語に変える設定を行っていきます。
+どのような設定、記述をすれば日本語表示に変わるのか、順を追ってブラウザで確かめていきましょう。
+
+
+日本語の言語設定を行いましょう
+application.rbを編集して、言語設定を変更しましょう。
+:jaは日本語設定にするという意味です。
+
+config/application.rb
+# 中略
+module Pictweet
+  class Application < Rails::Application
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 6.0
+
+    # 日本語の言語設定
+    config.i18n.default_locale = :ja
+      # 省略
+    end
+end
+
+
+Gemfileを編集しましょう
+日本語に対応する"rails-i18n"というGemを導入します。
+
+rails-i18n
+
+このGemの導入によって、下記サイトに記述してある日本語を使えるようになっています。
+どのような文言が日本語に翻訳してあるのか確認してみましょう。
+
+rails-i18nに登録されている日本語
+https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/ja.yml
+
+Gemfile
+#中略
+gem 'rails-i18n'
+
+
+続いて、以下のコマンドを実行しましょう。
+ターミナル
+bundle install
+
+上の作業で、
+application.rbにconfig.i18n.default_locale = :jaの記述をしないと日本語で反映されないので、
+忘れずに設定しましょう。
+
+
+日本語化用のファイルを作成しよう
+エラーメッセージを全て日本語にするためには、
+もう一つファイルを用意する必要があります。
+そのファイルのことをlocaleファイルと言います。
+
+
+localeファイル
+locale（ロケール）ファイルとは、様々な言語に対応できる言語ファイルです。
+localeファイルの中に日本語化用のファイルを作成することで、英語を日本語に翻訳してくれます。
+そして、その日本語へ翻訳するためのファイルは、通常YAMLというファイル形式を用います。
+
+
+YAML
+YAMLとは、ファイルの書き方のルールの一つで、
+中身が文字だけで記述されてるテキストファイルです。
+database.ymlもこれに当てはまり、データベースの接続に必要な設定が記述してあります。
+
+デフォルトでは、下記の例のように「英語」でYAMLファイルが書かれていますので、
+先程のエラーメッセージが英語で表示されます。
+
+【例】config/locales/devise.en.yml
+en:
+  devise:
+    confirmations:
+      confirmed: "Your email address has been successfully confirmed."
+      send_instructions: "You will receive an email with instructions for how to confirm your email address in a few minutes."
+   errors:
+     messages:
+       already_confirmed: "was already confirmed, please try signing in"
+       not_found: "not found"
+
+では次から「英語」から「日本語」に変換するために、日本語化用のYAMLファイルを導入しましょう。
+まずは、新規登録時とログイン時のエラーメッセージを日本語にするファイルを準備します。
+
+devise.ja.ymlを作成しましょう
+config/localesディレクトリに、devise.ja.ymlというファイルを作成します。
+
+config 　
+  locales
+    devise.ja.yml
+下記のサイトに記述内容が掲載されているので、
+丸ごとコピーして作成したdevise.ja.ymlの中に貼り付けましょう。
+
+ymlファイルは、インデントにミスがあるとエラーが生じます。
+コードを貼り付けた後、インデントにミスがないか必ず確認しましょう。
+devise.ja.yml
+https://github.com/tigrish/devise-i18n/blob/master/rails/locales/ja.yml
+
+
+ブラウザで確認しましょう
+ブラウザで確認する前に、サーバーを再起動しましょう。
+再起動後、localhost:3000に接続してそれぞれの画面で、
+フォームに何も入力せず送信ボタンを押した場合の挙動を確かめてみましょう。
+
+
+この段階で、ログイン画面は、全て日本語のエラーメッセージが表示されるようになりました。
+しかし、新規登録画面ではNicknameを入力してくださいと表示されており、
+Nicknameだけが英語になっています。
+
+日本語に翻訳する文言を確認しましょう
+先ほどブラウザで確認した通り、
+新規登録画面はNicknameを入力してくださいと表示されています。
+また、投稿画面はTextを入力してください、Imageを入力してくださいと表示されます。
+このNickname、Text、Imageは、
+Gem 'rails-i18n'やdevise.ja.ymlを導入したことによって使える日本語に含まれていないので、
+英語で表示されてしまいます。
+したがって、これらを翻訳するファイルを手動で作成していきます。
+
+
+ja.ymlを作成しましょう
+config/localesディレクトリに、ja.ymlというファイルを作成します。
+
+config
+  locales
+    devise.ja.yml
+    ja.yml
+
+ファイルを作成したら、以下の記述をしましょう。
+config/locales/ja.yml
+ja:
+  activerecord:
+    attributes:
+      user:
+        nickname: ニックネーム
+      tweet:
+        text: テキスト
+        image: 画像
+
+この記述で、Nickname、Text、Imageが日本語に翻訳されます。
+
+ブラウザで確認しましょう
+ブラウザで確認する前に、サーバーを再起動しましょう。
+再起動後、localhost:3000に接続してそれぞれの画面で、
+フォームに何も入力せず送信ボタンを押した場合の挙動を確かめてみましょう。
+
+
+ここまでの設定や記述によって、
+新規登録画面、ログイン画面、投稿画面の全てのエラーメッセージが日本語で表示されるようになりました。
+
+
+
+テストコードの書き換え
+エラーメッセージ を日本語に変更したということは、
+単体テストコードの中で使用している期待するエラーメッセージも日本語に変わるので、
+そちらも変更しましょう。
+
+現状のテストコードを確かめよう
+エラーメッセージが日本語に変わったということは、
+現状のテストコードではうまく検証ができません。
+現状のテストコードは英語のエラーメッセージが出現する前提で記述しているためです。
+
+両モデルのエラーの原因は同じです。
+原因を説明すると、エラーメッセージを日本語にしたものの、
+テストコードで期待するエラーメッセージがまだ英語になっているためです。
+したがって、この英語のエラーメッセージを日本語のエラーメッセージに書き換える必要があります。
+
+※Tweetモデルの失敗原因
+
+1) テキストのみであればツイートは保存される
+→Tweetモデルのバリデーションにimageも追記したので、
+textとimageの両方の入力がないとツイートが保存できないようになっています。
+したがって、このように失敗します。
+
+
+単体テストコードを日本語に書き換えよう
+UserモデルとTweetモデルの単体テストコードに記述してある、
+英語のエラーメッセージを日本語に変更します。
+
+
+Userモデルの単体テストを書き換えましょう
+expect(@user.errors.full_messages).to include('英語のエラーメッセージ')の部分を
+('日本語のエラーメッセージ')に変更します。
+spec/models/user_spec.rb
+require 'rails_helper'
+describe User do
+  before do
+    @user = FactoryBot.build(:user)
+  end
+
+  describe 'ユーザー新規登録' do
+    context '新規登録がうまくいくとき' do
+      it 'nicknameとemail、passwordとpassword_confirmationが存在すれば登録できる' do
+        expect(@user).to be_valid
+      end
+      it 'nicknameが6文字以下では登録できる' do
+        @user.nickname = 'aaaaaa'
+        expect(@user).to be_valid
+      end
+      it 'passwordが6文字以上であれば登録できる' do
+        @user.password = '000000'
+        @user.password_confirmation = '000000'
+        expect(@user).to be_valid
+      end
+    end
+
+    context '新規登録がうまくいかないとき' do
+      it 'nicknameが空だと登録できない' do
+        @user.nickname = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('ニックネームを入力してください')
+      end
+      it 'nicknameが7文字以上であれば登録できない' do
+        @user.nickname = 'aaaaaaa'
+        @user.valid?
+        expect(@user.errors.full_messages).to include('ニックネームは6文字以内で入力してください')
+      end
+      it 'emailが空では登録できない' do
+        @user.email = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('Eメールを入力してください')
+      end
+      it '重複したemailが存在する場合登録できない' do
+        @user.save
+        another_user = FactoryBot.build(:user)
+        another_user.email = @user.email
+        another_user.valid?
+        expect(another_user.errors.full_messages).to include('Eメールはすでに存在します')
+      end
+      it 'passwordが空では登録できない' do
+        @user.password = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('パスワードを入力してください')
+      end
+      it 'passwordが5文字以下であれば登録できない' do
+        @user.password = '00000'
+        @user.password_confirmation = '00000'
+        @user.valid?
+        expect(@user.errors.full_messages).to include('パスワードは6文字以上で入力してください')
+      end
+      it 'passwordが存在してもpassword_confirmationが空では登録できない' do
+        @user.password_confirmation = ''
+        @user.valid?
+        expect(@user.errors.full_messages).to include('パスワード（確認用）とパスワードの入力が一致しません')
+      end
+    end
+  end
+end
+
+
+テストコードを実行しましょう
+ターミナル
+bundle exec rspec spec/models/user_spec.rb 
+
+以下のログのようにテストがすべてパスしていれば成功です。
+ターミナル
+User
+  ユーザー新規登録
+    新規登録がうまくいくとき
+      nicknameとemail、passwordとpassword_confirmationが存在すれば登録できる
+      nicknameが6文字以下では登録できる
+      passwordが6文字以上であれば登録できる
+    新規登録がうまくいかないとき
+      nicknameが空だと登録できない
+      nicknameが7文字以上であれば登録できない
+      emailが空では登録できない
+      重複したemailが存在する場合登録できない
+      passwordが空では登録できない
+      passwordが5文字以下であれば登録できない
+      passwordが存在してもpassword_confirmationが空では登録できない
+
+Finished in 10.4 seconds (files took 7.39 seconds to load)
+10 examples, 0 failures
+
+
+
+Tweetモデルの単体テストを書き換えましょう
+Userモデルの変更と同じく
+expect(@user.errors.full_messages).to include('英語のエラーメッセージ')の部分を('日本語のエラーメッセージ')に変更します。
+
+Tweetモデルには、バリデーションにimageを追記したので、textとimage両方の入力が
+ないとツイートが保存できないようになっています。
+したがって、'テキストのみであればツイートは保存される'の部分は、
+コメントアウトか削除をしましょう。そして、imageについてのテストを追加しています。
+
+spec/models/tweet_spec.rb
+require 'rails_helper'
+
+RSpec.describe Tweet, type: :model do
+  before do
+    @tweet = FactoryBot.build(:tweet)
+  end
+
+  describe 'ツイートの保存' do
+    context 'ツイートが保存できる場合' do
+      it '画像とテキストがあればツイートは保存される' do
+        expect(@tweet).to be_valid
+      end
+
+      # ↓↓下記はコメントアウトか削除↓↓
+      # it 'テキストのみであればツイートは保存される' do
+      #   @tweet.image = ''
+      #   expect(@tweet).to be_valid
+      # end
+    end
+
+    context 'ツイートが保存できない場合' do
+      it 'テキストがないとツイートは保存できない' do
+        @tweet.text = ''
+        @tweet.valid?
+        expect(@tweet.errors.full_messages).to include('テキストを入力してください')
+      end
+      it '画像がないとツイートは保存できない' do
+        @tweet.image = nil
+        @tweet.valid?
+        expect(@tweet.errors.full_messages).to include('画像を入力してください')
+      end
+      it 'ユーザーが紐付いていないとツイートは保存できない' do
+        @tweet.user = nil
+        @tweet.valid?
+        expect(@tweet.errors.full_messages).to include('Userを入力してください')
+      end
+    end
+  end
+end
+
+35行目のexpect(@tweet.errors.full_messages).to include('Userを入力してください')
+のUserは、今回ja.ymlに記述してないので、Userのままで問題ありません。
+
+
+テストコードを実行しましょう
+ターミナル
+bundle exec rspec spec/models/tweet_spec.rb
+
+以下のログのようにテストがすべてパスしていれば成功です。
+ターミナル
+Tweet
+  ツイートの保存
+    ツイートが保存できる場合
+      画像とテキストがあればツイートは保存される
+    ツイートが保存できない場合
+      テキストがないとツイートは保存できない
+      画像がないとツイートは保存できない
+      ユーザーが紐付いていないとツイートは保存できない
+
+Finished in 0.64743 seconds (files took 4.05 seconds to load)
+4 examples, 0 failures
+
+ここまで記述し、テストコードが正常に通ったら完了です。
+
+
+要点チェック
+設定を変更すると、エラーメッセージを英語から日本語に変換できること
+rails-i18nは、日本語に対応できるgemであること
+localeファイルとは、様々な言語に対応できる言語ファイルであること
+YAMLとは、中身が文字だけで記述されているプログラムであること
+devise.ja.ymlとは、deviseを用いて導入したユーザー管理機能のエラーメッセージを日本語化するファイルであること
+ja.ymlとは、アプリケーション上の英語を日本語へ変換するファイルであること
