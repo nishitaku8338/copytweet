@@ -1700,3 +1700,56 @@ application.rbにconfig.i18n.default_locale = :jaの記述をしないと日本�
 忘れずに設定しましょう。
 
 
+日本語化用のファイルを作成しよう
+エラーメッセージを全て日本語にするためには、
+もう一つファイルを用意する必要があります。
+そのファイルのことをlocaleファイルと言います。
+
+
+localeファイル
+locale（ロケール）ファイルとは、様々な言語に対応できる言語ファイルです。
+localeファイルの中に日本語化用のファイルを作成することで、英語を日本語に翻訳してくれます。
+そして、その日本語へ翻訳するためのファイルは、通常YAMLというファイル形式を用います。
+
+
+YAML
+YAMLとは、ファイルの書き方のルールの一つで、
+中身が文字だけで記述されてるテキストファイルです。
+database.ymlもこれに当てはまり、データベースの接続に必要な設定が記述してあります。
+
+デフォルトでは、下記の例のように「英語」でYAMLファイルが書かれていますので、
+先程のエラーメッセージが英語で表示されます。
+
+【例】config/locales/devise.en.yml
+en:
+  devise:
+    confirmations:
+      confirmed: "Your email address has been successfully confirmed."
+      send_instructions: "You will receive an email with instructions for how to confirm your email address in a few minutes."
+   errors:
+     messages:
+       already_confirmed: "was already confirmed, please try signing in"
+       not_found: "not found"
+
+では次から「英語」から「日本語」に変換するために、日本語化用のYAMLファイルを導入しましょう。
+まずは、新規登録時とログイン時のエラーメッセージを日本語にするファイルを準備します。
+
+devise.ja.ymlを作成しましょう
+config/localesディレクトリに、devise.ja.ymlというファイルを作成します。
+
+config 　
+  locales
+    devise.ja.yml
+下記のサイトに記述内容が掲載されているので、
+丸ごとコピーして作成したdevise.ja.ymlの中に貼り付けましょう。
+
+ymlファイルは、インデントにミスがあるとエラーが生じます。
+コードを貼り付けた後、インデントにミスがないか必ず確認しましょう。
+devise.ja.yml
+https://github.com/tigrish/devise-i18n/blob/master/rails/locales/ja.yml
+
+
+ブラウザで確認しましょう
+ブラウザで確認する前に、サーバーを再起動しましょう。
+再起動後、localhost:3000に接続してそれぞれの画面で、
+フォームに何も入力せず送信ボタンを押した場合の挙動を確かめてみましょう。
