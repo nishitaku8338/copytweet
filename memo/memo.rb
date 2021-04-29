@@ -1516,3 +1516,103 @@ have_selectorを使用すると、指定したセレクタが存在するか判�
 have_linkを使用すると、要素の中に当てはまるリンクがあることを確認できること
 allを使用すると、pageに存在する同名のクラスを持つ要素をまとめて取得できること
 find_link().clickを使用すると、a要素で表示されているリンクをクリックできること
+
+
+
+日本語対応をする
+アプリケーションのエラーメッセージを日本語化しよう
+
+概要
+本章では、PicTweetを例に、
+ユーザー登録やツイート投稿画面の入力フォームが空だった場合に表示されるエラーメッセージを、
+英語から日本語に変換する方法を学びます。
+どのような設定、記述を行うと日本語のエラーメッセージに変換されるのかを、順を追って説明していきます。
+
+
+目的
+エラーメッセージの表示方法を学ぶこと
+ファイルの言語設定について理解すること
+英語を日本語に変換する方法を学ぶこと
+
+
+事前準備
+事前準備として、PicTweetを例に、まずは英語でエラーメッセージを表示させる機能を実装していきます。
+現状、投稿画面とログイン画面は、
+入力フォームが空だった場合にエラー内容が何も表示されない仕様になっていますので、
+エラーメッセージを表示させる記述をしていきます。
+
+
+投稿画面を編集
+投稿画面で画像とテキストに何も入力せず投稿した場合に、エラーメッセージが表示される設定
+
+モデルを編集
+テキストに加え、画像も空では投稿できないように、バリデーションを追記
+app/models/tweet.rb
+class Tweet < ApplicationRecord
+  belongs_to :user
+  has_many :comments 
+
+  # imageも空で投稿できないように追記
+  validates :text, :image, presence: true
+
+  # 以下省略
+
+end
+
+
+コントローラーを編集
+createアクションの中にツイートが保存される場合の条件分岐を追記します。
+@tweetを定義し、valild?メソッドを使用してツイートが保存されなければ、newへ戻る記述をします。
+
+app/controllers/tweets_controller.rb
+#中略
+def create
+  @tweet = Tweet.new(tweet_params)
+  #バリデーションで問題があれば、保存はされず「投稿画面」に戻る
+  if @tweet.valid?
+    @tweet.save
+    redirect_to root_path
+  else
+    #保存されなければ、newに戻る
+    render 'new'
+  end
+end
+
+
+ビューを編集しましょう
+エラーメッセージのビューを作成します。
+views/layoutsの下に_error_messages.html.erbファイルを自作しましょう。
+
+どのモデルのバリデーションにも対応できるように、if文にmodel.errors.any? を記述します。
+app/views/layouts/_error_messages.html.erb
+<% if model.errors.any? %>
+  <div class="error-alert">
+  <ul>
+    <% model.errors.full_messages.each do |message| %>
+    <li class='error-message'><%= message %></li>
+    <% end %>
+  </ul>
+  </div>
+# <% end %>
+
+
+次に、エラーメッセージを表示させる部分に以下のような記述をしましょう。
+ツイートが保存されなかった場合、
+# <%= render 'layouts/error_messages', model: form.object %>が読み込まれエラーメッセージが表示されます。
+
+app/views/tweets/new.html.erb
+<div class="contents row">
+  <div class="container">
+    <%= form_with(model: @tweet, local: true) do |form| %>
+      <h3>
+        投稿する
+      </h3>
+      <%= render 'layouts/error_messages', model: form.object %>
+      <%= render partial: "form", locals: { form: form } %>
+    <% end %>
+  </div>
+</div>
+
+
+ここまでで、投稿画面で画像とテキストを何も入力せず投稿した場合に、
+エラーメッセージが表示される設定が完了しました。
