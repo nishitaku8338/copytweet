@@ -1650,3 +1650,26 @@ app/views/devise/sessions/new.html.erb
 サーバーを起動し、localhost:3000に接続して、
 それぞれの画面でフォームに何も入力せず送信ボタンを押した場合の挙動を確かめてみましょう。
 
+
+エラーメッセージの日本語化
+日本語化の設定をしよう
+英語から日本語に変える設定を行っていきます。
+どのような設定、記述をすれば日本語表示に変わるのか、順を追ってブラウザで確かめていきましょう。
+
+
+日本語の言語設定を行いましょう
+application.rbを編集して、言語設定を変更しましょう。
+:jaは日本語設定にするという意味です。
+
+config/application.rb
+# 中略
+module Pictweet
+  class Application < Rails::Application
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 6.0
+
+    # 日本語の言語設定
+    config.i18n.default_locale = :ja
+      # 省略
+    end
+end
