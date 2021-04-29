@@ -60,3 +60,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'pry-rails'  # デバック作業のGemを導入
 gem 'devise'     # ユーザー管理機能を簡単に実装するためのGem
+gem 'rails-i18n' # 日本語に対応する"rails-i18n"というGemを導入

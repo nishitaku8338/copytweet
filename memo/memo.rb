@@ -1673,3 +1673,30 @@ module Pictweet
       # 省略
     end
 end
+
+
+Gemfileを編集しましょう
+日本語に対応する"rails-i18n"というGemを導入します。
+
+rails-i18n
+
+このGemの導入によって、下記サイトに記述してある日本語を使えるようになっています。
+どのような文言が日本語に翻訳してあるのか確認してみましょう。
+
+rails-i18nに登録されている日本語
+https://github.com/svenfuchs/rails-i18n/blob/master/rails/locale/ja.yml
+
+Gemfile
+#中略
+gem 'rails-i18n'
+
+
+続いて、以下のコマンドを実行しましょう。
+ターミナル
+bundle install
+
+上の作業で、
+application.rbにconfig.i18n.default_locale = :jaの記述をしないと日本語で反映されないので、
+忘れずに設定しましょう。
+
+
